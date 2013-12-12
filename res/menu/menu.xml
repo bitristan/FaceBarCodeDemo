@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/camera"
+        android:showAsAction="ifRoom"
+        android:title="相机">
+    </item>
+    <!--<item-->
+        <!--android:id="@+id/detail_action_more"-->
+        <!--android:icon="?android:moreIcon"-->
+        <!--android:showAsAction="always"-->
+        <!--android:title="更多">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/camera"-->
+                <!--android:showAsAction="ifRoom"-->
+                <!--android:title="相机">-->
+            <!--</item>-->
+            <!--<item-->
+                <!--android:id="@+id/photo"-->
+                <!--android:showAsAction="ifRoom"-->
+                <!--android:title="相册">-->
+            <!--</item>-->
+        <!--</menu>-->
+    <!--</item>-->
+</menu>

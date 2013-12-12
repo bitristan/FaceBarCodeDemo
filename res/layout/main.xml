@@ -14,15 +14,15 @@
 
         <ImageView
             android:id="@+id/preview_iv"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:layout_centerHorizontal="true"
             android:contentDescription="nothing"/>
 
         <ImageView
             android:id="@+id/original_iv"
-            android:layout_width="350dp"
-            android:layout_height="350dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:layout_centerHorizontal="true"
             android:contentDescription="nothing"
             android:layout_below="@id/preview_iv"/>

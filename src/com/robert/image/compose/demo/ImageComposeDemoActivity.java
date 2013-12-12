@@ -1,12 +1,20 @@
 package com.robert.image.compose.demo;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.*;
 import android.media.FaceDetector;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 import com.google.zxing.*;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
@@ -26,6 +34,8 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
 
     private static final String IMAGE_DIR = "image";
 
+    private static final int TAKE_PICTURE = 10000;
+
     String images[];
 
     ImageView mPreviewIv;
@@ -43,10 +53,14 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
 
     boolean mStepForward = true;
 
+    private ActionBar mActionBar;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        mActionBar = getActionBar();
 
         initImages();
 
@@ -67,6 +81,45 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
         //Bitmap bitmap = mosaic(mOriginal);
         //Bitmap bitmap = halo(mOriginal, 50, 50, 100);
         //mPreviewIv.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.camera:
+                Intent openCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Uri imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "/test/1000.jpg"));
+                openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                startActivityForResult(openCameraIntent, TAKE_PICTURE);
+                break;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case TAKE_PICTURE:
+                    mOriginal = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/test/1000.jpg");
+                    mOriginalIv.setImageBitmap(mOriginal);
+
+                    QRCode qrcode = encodeQrcode(null);
+                    Bitmap composedBmp = composeBinarization(null, qrcode);
+                    mPreviewIv.setImageBitmap(composedBmp);
+                    break;
+            }
+        }
     }
 
     private void initImages() {
@@ -314,7 +367,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
         final int MAX_FACES = 4;
         FaceDetector.Face[] faces = new FaceDetector.Face[MAX_FACES];
         FaceDetector detector = new FaceDetector(bitmap.getWidth(),
-                bitmap.getHeight(), MAX_FACES);
+                                                    bitmap.getHeight(), MAX_FACES);
         int num = detector.findFaces(bitmap, faces);
 
         if (num > 0) {
@@ -339,7 +392,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                 }
 
                 Bitmap dist = Bitmap.createBitmap(bitmap, (int) left,
-                        (int) top, width, height);
+                                                     (int) top, width, height);
                 int w = dist.getWidth();
                 int h = dist.getHeight();
                 int dot = 20;
@@ -351,7 +404,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                         for (int k = 0; k < dot; k++) {
                             for (int l = 0; l < dot; l++) {
                                 int dotColor = dist.getPixel(i * dot + k, j
-                                        * dot + l);
+                                                                              * dot + l);
                                 rr += Color.red(dotColor);
                                 gg += Color.green(dotColor);
                                 bb += Color.blue(dotColor);
@@ -363,7 +416,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                         for (int k = 0; k < dot; k++) {
                             for (int l = 0; l < dot; l++) {
                                 dist.setPixel(i * dot + k, j * dot + l,
-                                        Color.rgb(rr, gg, bb));
+                                                 Color.rgb(rr, gg, bb));
                             }
                         }
                     }
@@ -538,19 +591,19 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
         Canvas canvas = new Canvas(result);
         Paint paint = new Paint();
         ColorMatrix lightenColorMatrix = new ColorMatrix();
-        lightenColorMatrix.set(new float[] {
-                1, 0, 0, 0, 20,
-                0, 1, 0, 0, 20,
-                0, 0, 1, 0, 20,
-                0, 0, 0, 1, 0
+        lightenColorMatrix.set(new float[]{
+                                              1, 0, 0, 0, 20,
+                                              0, 1, 0, 0, 20,
+                                              0, 0, 1, 0, 20,
+                                              0, 0, 0, 1, 0
         });
         ColorMatrix contrastColorMatrix = new ColorMatrix();
         float contrastCoefficient = 1.25f;
-        contrastColorMatrix.set(new float[] {
-                contrastCoefficient, 0, 0, 0, 128 * (1 - contrastCoefficient),
-                0, contrastCoefficient, 0, 0, 128 * (1 - contrastCoefficient),
-                0, 0, contrastCoefficient, 0, 128 * (1 - contrastCoefficient),
-                0, 0, 0, 1, 0
+        contrastColorMatrix.set(new float[]{
+                                               contrastCoefficient, 0, 0, 0, 128 * (1 - contrastCoefficient),
+                                               0, contrastCoefficient, 0, 0, 128 * (1 - contrastCoefficient),
+                                               0, 0, contrastCoefficient, 0, 128 * (1 - contrastCoefficient),
+                                               0, 0, 0, 1, 0
         });
         lightenColorMatrix.postConcat(contrastColorMatrix);
         paint.setColorFilter(new ColorMatrixColorFilter(lightenColorMatrix));
@@ -573,4 +626,5 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
 
         return false;
     }
+
 }
