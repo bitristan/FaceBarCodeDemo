@@ -65,6 +65,13 @@ public class QRCodeOptions {
      */
 	public BorderType outBorderType;
 
+    /**
+     * 表示是否植入文字
+     */
+    public String textContent;
+
+    public int textSize;
+
 	public QRCodeOptions() {
 		outWidth = DEFAULT_WIDTH;
 		outHeight = DEFAULT_HEIGHT;
@@ -77,5 +84,7 @@ public class QRCodeOptions {
 		outShape = Shape.NORMAL;
 		outGradientType = GradientType.NORMAL;
 		outErrorCorrectionLevel = DEFAULT_ERROR_CORRECTION_LEVEL;
+        textContent = null;
+        textSize = 0;
 	}
 }

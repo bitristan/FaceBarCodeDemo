@@ -303,6 +303,8 @@ public class QRCodeGenerator {
 		int width = options.outWidth;
 		int height = options.outHeight;
 
+        boolean hasTextContent = !TextUtils.isEmpty(options.textContent) && (options.textSize != 0);
+
 		ByteMatrix input = mQRCode.getMatrix();
 		if (input == null) {
 			throw new IllegalStateException();
@@ -318,8 +320,7 @@ public class QRCodeGenerator {
 		int leftPadding = (outputWidth - qrDimension * boxSize) >> 1;
 		int topPadding = (outputHeight - qrDimension * boxSize) >> 1;
 
-		Bitmap bitmap = Bitmap.createBitmap(outputWidth, outputHeight,
-				Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
@@ -373,12 +374,33 @@ public class QRCodeGenerator {
 		topPadding += (((outputHeight - (topPadding << 1)) % boxSize) >> 1);
 		leftPadding += (((outputWidth - (topPadding << 1)) % boxSize) >> 1);
 
+        int textDefaultColor = options.outBackgroundColor & Color.RED;
+        Bitmap textBt = null;
+        if (hasTextContent) {
+            textBt = Bitmap.createBitmap(outputWidth, outputHeight, Config.ARGB_8888);
+            Canvas textCanvas = new Canvas(textBt);
+            textCanvas.drawColor(Color.WHITE);
+            Paint textPaint = new Paint();
+            textPaint.setDither(true);
+            textPaint.setAntiAlias(true);
+            textPaint.setColor(textDefaultColor);
+            textPaint.setTextSize(options.textSize);
+
+            int xPos = (textCanvas.getWidth() - (int) textPaint.measureText(options.textContent)) / 2;
+            int yPos = (int) ((textCanvas.getHeight() / 2) - ((textPaint.descent() + textPaint.ascent()) / 2));
+            textCanvas.drawText(options.textContent, xPos, yPos, textPaint);
+            textPaint.setColor(options.outForegroundColor);
+            canvas.drawText(options.textContent, xPos, yPos, textPaint);
+        }
+
 		int inputX, inputY;
+        boolean isTextPoint = false;
 		for (int outputY = topPadding; outputY < outputHeight - topPadding; outputY += boxSize) {
 			// 总是取ceil值，避免(-1, 1)之间0出现两次
 			inputY = (int) Math.ceil((outputY - insideRect.top) / (double) boxSize);
 			for (int outputX = leftPadding; outputX < outputWidth - leftPadding; outputX += boxSize) {
 				inputX = (int) Math.ceil((outputX - insideRect.left) / (double) boxSize);
+                isTextPoint = false;
 
 				if (options.outBackgroundImage != null
 						&& options.outComposeType == ComposeType.ALTERNATIVE) {
@@ -488,59 +510,87 @@ public class QRCodeGenerator {
 					Shape shape = options.outShape;
 					if (isSet(input, inputX, inputY)) {
 						if (shape == Shape.ROUND) { // 圆角
-							canvas.drawRoundRect(new RectF(outputX, outputY,
+                            if (hasTextContent) {
+                                Rect searchRect = new Rect(outputX, outputY, outputX + boxSize, outputY + boxSize);
+                                int color = QRCodeUtil.getColorOnBitmap(textBt, searchRect, textDefaultColor);
+                                isTextPoint = (color == textDefaultColor);
+                            }
+                            if (!isTextPoint) canvas.drawRoundRect(new RectF(outputX, outputY,
 									outputX + boxSize, outputY + boxSize),
 									roundRectRadius, roundRectRadius, paint);
 						} else if (shape == Shape.WATER) { // 液态
-							drawRoundRect(
-									canvas,
-									new RectF(outputX, outputY, outputX
-											+ boxSize, outputY + boxSize),
-									paint,
-									roundRectRadius,
-									isSet(input, inputX - 1, inputY - 1)
-											|| isSet(input, inputX, inputY - 1)
-											|| isSet(input, inputX - 1, inputY),
-									isSet(input, inputX, inputY - 1)
-											|| isSet(input, inputX + 1,
-													inputY - 1)
-											|| isSet(input, inputX + 1, inputY),
-									isSet(input, inputX, inputY + 1)
-											|| isSet(input, inputX - 1,
-													inputY + 1)
-											|| isSet(input, inputX - 1, inputY),
-									isSet(input, inputX + 1, inputY)
-											|| isSet(input, inputX + 1,
-													inputY + 1)
-											|| isSet(input, inputX, inputY + 1));
+                            if (hasTextContent) {
+                                Rect searchRect = new Rect(outputX, outputY, outputX + boxSize, outputY + boxSize);
+                                int color = QRCodeUtil.getColorOnBitmap(textBt, searchRect, textDefaultColor);
+                                isTextPoint = (color == textDefaultColor);
+                            }
+
+                            if (!isTextPoint) {
+                                //没有搜索到 textDefaultColor
+                                drawRoundRect(
+                                        canvas,
+                                        new RectF(outputX, outputY, outputX
+                                                + boxSize, outputY + boxSize),
+                                        paint,
+                                        roundRectRadius,
+                                        isSet(input, inputX - 1, inputY - 1)
+                                                || isSet(input, inputX, inputY - 1)
+                                                || isSet(input, inputX - 1, inputY),
+                                        isSet(input, inputX, inputY - 1)
+                                                || isSet(input, inputX + 1,
+                                                        inputY - 1)
+                                                || isSet(input, inputX + 1, inputY),
+                                        isSet(input, inputX, inputY + 1)
+                                                || isSet(input, inputX - 1,
+                                                        inputY + 1)
+                                                || isSet(input, inputX - 1, inputY),
+                                        isSet(input, inputX + 1, inputY)
+                                                || isSet(input, inputX + 1,
+                                                        inputY + 1)
+                                                || isSet(input, inputX, inputY + 1));
+                            }
 						} else { // 正常
-							canvas.drawRect(outputX, outputY,
-									outputX + boxSize, outputY + boxSize, paint);
+                            if (hasTextContent) {
+                                Rect searchRect = new Rect(outputX, outputY, outputX + boxSize, outputY + boxSize);
+                                int color = QRCodeUtil.getColorOnBitmap(textBt, searchRect, textDefaultColor);
+                                isTextPoint = (color == textDefaultColor);
+                            }
+                            if (!isTextPoint) canvas.drawRect(outputX, outputY, outputX + boxSize, outputY + boxSize, paint);
 						}
 					} else {
 						if (shape == Shape.WATER) {
+                            if (hasTextContent) {
+                                Rect searchRect = new Rect(outputX, outputY, outputX + boxSize, outputY + boxSize);
+                                int color = QRCodeUtil.getColorOnBitmap(textBt, searchRect, textDefaultColor);
+                                isTextPoint = (color == textDefaultColor);
+                            }
+
 							RectF rect = new RectF(outputX, outputY, outputX
 									+ boxSize, outputY + boxSize);
 							if (isSet(input, inputX, inputY - 1)
-									&& isSet(input, inputX - 1, inputY)) {
+									&& isSet(input, inputX - 1, inputY)
+                                    && !isTextPoint) {
 								drawAntiRoundRect(canvas, paint,
 										roundRectRadius, rect, 1);
 							}
 
 							if (isSet(input, inputX, inputY - 1)
-									&& isSet(input, inputX + 1, inputY)) {
+									&& isSet(input, inputX + 1, inputY)
+                                    && !isTextPoint) {
 								drawAntiRoundRect(canvas, paint,
 										roundRectRadius, rect, 2);
 							}
 
 							if (isSet(input, inputX, inputY + 1)
-									&& isSet(input, inputX + 1, inputY)) {
+									&& isSet(input, inputX + 1, inputY)
+                                    && !isTextPoint) {
 								drawAntiRoundRect(canvas, paint,
 										roundRectRadius, rect, 3);
 							}
 
 							if (isSet(input, inputX - 1, inputY)
-									&& isSet(input, inputX, inputY + 1)) {
+									&& isSet(input, inputX, inputY + 1)
+                                    && !isTextPoint) {
 								drawAntiRoundRect(canvas, paint,
 										roundRectRadius, rect, 4);
 							}
@@ -551,9 +601,10 @@ public class QRCodeGenerator {
 			}
 		}
 
-		return composeBitmap(bitmap, options.outBackgroundImage,
-				options.outComposeType, (int) leftPadding, (int) topPadding,
-				options.outBackgroundColor);
+        return bitmap;
+//		return composeBitmap(bitmap, options.outBackgroundImage,
+//				options.outComposeType, (int) leftPadding, (int) topPadding,
+//				options.outBackgroundColor);
 	}
 
 	public Bitmap generateAngryBird(AngryBirdOptions options)

@@ -24,7 +24,33 @@ import java.io.FileOutputStream;
  */
 public class QRCodeUtils {
 
-    public static Bitmap makeWaterQRCodeBt(String content, int size, int color) {
+    public static Bitmap makePointQRCodeBt(String content, int size, int color, String textContent, int textSize) {
+        final QRCodeOptions options = new QRCodeOptions();
+        options.outWidth = size;
+        options.outHeight = size;
+        options.outBackgroundColor = Color.WHITE;
+        options.outForegroundColor = color;
+//        options.outGradientColor = -65528;
+//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
+//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
+        options.outShape = QRCodeOptions.Shape.ROUND;
+        options.outErrorCorrectionLevel= ErrorCorrectionLevel.M;
+        options.outRadiuspercent = 0.7f;
+        options.textSize = textSize;
+        options.textContent = textContent;
+
+        QRCodeGenerator QRCodeGenerator = new QRCodeGenerator(content);
+
+        try {
+            return QRCodeGenerator.generate(options);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Bitmap makeWaterQRCodeBt(String content, int size, int color, String textContent, int textSize) {
         final QRCodeOptions options = new QRCodeOptions();
         options.outWidth = size;
         options.outHeight = size;
@@ -34,7 +60,10 @@ public class QRCodeUtils {
 //        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
 //        options.outBorderType = QRCodeOptions.BorderType.ROUND;
         options.outShape = QRCodeOptions.Shape.WATER;
+        options.outErrorCorrectionLevel= ErrorCorrectionLevel.M;
         options.outRadiuspercent = 0.7f;
+        options.textSize = textSize;
+        options.textContent = textContent;
 
         QRCodeGenerator QRCodeGenerator = new QRCodeGenerator(content);
 

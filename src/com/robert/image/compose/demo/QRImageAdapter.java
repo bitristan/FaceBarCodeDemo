@@ -32,7 +32,7 @@ public class QRImageAdapter extends PagerAdapter {
 
     @Override
     public String getPageTitle(int position) {
-        return "效果" + position;
+        return "效果" + (position + 1);
     }
 
     @Override
