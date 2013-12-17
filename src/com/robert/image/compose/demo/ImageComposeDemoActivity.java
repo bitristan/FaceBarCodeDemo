@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 import com.google.zxing.*;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
@@ -98,6 +97,14 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                 Uri imageUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), "/test/1000.jpg"));
                 openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(openCameraIntent, TAKE_PICTURE);
+                break;
+            case R.id.text:
+                startActivity(new Intent(this, FontActivity.class));
+                break;
+            case R.id.text_stroke:
+                startActivity(new Intent(this, TextCodeActivity.class));
+                break;
+            default:
                 break;
         }
 
@@ -367,7 +374,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
         final int MAX_FACES = 4;
         FaceDetector.Face[] faces = new FaceDetector.Face[MAX_FACES];
         FaceDetector detector = new FaceDetector(bitmap.getWidth(),
-                                                    bitmap.getHeight(), MAX_FACES);
+                bitmap.getHeight(), MAX_FACES);
         int num = detector.findFaces(bitmap, faces);
 
         if (num > 0) {
@@ -392,7 +399,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                 }
 
                 Bitmap dist = Bitmap.createBitmap(bitmap, (int) left,
-                                                     (int) top, width, height);
+                        (int) top, width, height);
                 int w = dist.getWidth();
                 int h = dist.getHeight();
                 int dot = 20;
@@ -404,7 +411,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                         for (int k = 0; k < dot; k++) {
                             for (int l = 0; l < dot; l++) {
                                 int dotColor = dist.getPixel(i * dot + k, j
-                                                                              * dot + l);
+                                        * dot + l);
                                 rr += Color.red(dotColor);
                                 gg += Color.green(dotColor);
                                 bb += Color.blue(dotColor);
@@ -416,7 +423,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                         for (int k = 0; k < dot; k++) {
                             for (int l = 0; l < dot; l++) {
                                 dist.setPixel(i * dot + k, j * dot + l,
-                                                 Color.rgb(rr, gg, bb));
+                                        Color.rgb(rr, gg, bb));
                             }
                         }
                     }
@@ -592,18 +599,18 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
         Paint paint = new Paint();
         ColorMatrix lightenColorMatrix = new ColorMatrix();
         lightenColorMatrix.set(new float[]{
-                                              1, 0, 0, 0, 20,
-                                              0, 1, 0, 0, 20,
-                                              0, 0, 1, 0, 20,
-                                              0, 0, 0, 1, 0
+                1, 0, 0, 0, 20,
+                0, 1, 0, 0, 20,
+                0, 0, 1, 0, 20,
+                0, 0, 0, 1, 0
         });
         ColorMatrix contrastColorMatrix = new ColorMatrix();
         float contrastCoefficient = 1.25f;
         contrastColorMatrix.set(new float[]{
-                                               contrastCoefficient, 0, 0, 0, 128 * (1 - contrastCoefficient),
-                                               0, contrastCoefficient, 0, 0, 128 * (1 - contrastCoefficient),
-                                               0, 0, contrastCoefficient, 0, 128 * (1 - contrastCoefficient),
-                                               0, 0, 0, 1, 0
+                contrastCoefficient, 0, 0, 0, 128 * (1 - contrastCoefficient),
+                0, contrastCoefficient, 0, 0, 128 * (1 - contrastCoefficient),
+                0, 0, contrastCoefficient, 0, 128 * (1 - contrastCoefficient),
+                0, 0, 0, 1, 0
         });
         lightenColorMatrix.postConcat(contrastColorMatrix);
         paint.setColorFilter(new ColorMatrixColorFilter(lightenColorMatrix));

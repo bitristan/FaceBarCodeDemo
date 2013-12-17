@@ -2,26 +2,40 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/camera"
-        android:showAsAction="ifRoom"
-        android:title="相机">
+            android:id="@+id/camera"
+            android:showAsAction="ifRoom"
+            android:title="相机">
     </item>
+
+    <item
+            android:id="@+id/text"
+            android:showAsAction="ifRoom"
+            android:title="文字处理">
+    </item>
+
+    <item
+            android:id="@+id/text_stroke"
+            android:showAsAction="ifRoom"
+            android:title="文字描边">
+    </item>
+
+
     <!--<item-->
-        <!--android:id="@+id/detail_action_more"-->
-        <!--android:icon="?android:moreIcon"-->
-        <!--android:showAsAction="always"-->
-        <!--android:title="更多">-->
-        <!--<menu>-->
-            <!--<item-->
-                <!--android:id="@+id/camera"-->
-                <!--android:showAsAction="ifRoom"-->
-                <!--android:title="相机">-->
-            <!--</item>-->
-            <!--<item-->
-                <!--android:id="@+id/photo"-->
-                <!--android:showAsAction="ifRoom"-->
-                <!--android:title="相册">-->
-            <!--</item>-->
-        <!--</menu>-->
+    <!--android:id="@+id/detail_action_more"-->
+    <!--android:icon="?android:moreIcon"-->
+    <!--android:showAsAction="always"-->
+    <!--android:title="更多">-->
+    <!--<menu>-->
+    <!--<item-->
+    <!--android:id="@+id/camera"-->
+    <!--android:showAsAction="ifRoom"-->
+    <!--android:title="相机">-->
+    <!--</item>-->
+    <!--<item-->
+    <!--android:id="@+id/photo"-->
+    <!--android:showAsAction="ifRoom"-->
+    <!--android:title="相册">-->
+    <!--</item>-->
+    <!--</menu>-->
     <!--</item>-->
 </menu>
