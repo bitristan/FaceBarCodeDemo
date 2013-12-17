@@ -74,7 +74,7 @@
             android:id="@+id/c5"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/invite_text_color_a"
+            android:background="@color/red"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"/>
         <View

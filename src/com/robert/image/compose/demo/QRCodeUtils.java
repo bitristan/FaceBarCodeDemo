@@ -1,5 +1,6 @@
 package com.robert.image.compose.demo;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -11,6 +12,8 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.qrcode.sdk.QRCodeGenerator;
+import com.qrcode.sdk.QRCodeOptions;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +23,29 @@ import java.io.FileOutputStream;
  * Created by michael on 13-12-17.
  */
 public class QRCodeUtils {
+
+    public static Bitmap makeWaterQRCodeBt(String content, int size, int color) {
+        final QRCodeOptions options = new QRCodeOptions();
+        options.outWidth = size;
+        options.outHeight = size;
+        options.outBackgroundColor = Color.WHITE;
+        options.outForegroundColor = color;
+//        options.outGradientColor = -65528;
+//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
+//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
+        options.outShape = QRCodeOptions.Shape.WATER;
+        options.outRadiuspercent = 0.7f;
+
+        QRCodeGenerator QRCodeGenerator = new QRCodeGenerator(content);
+
+        try {
+            return QRCodeGenerator.generate(options);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static QRCode encodeQrcode(String content) {
         if (TextUtils.isEmpty(content)) {

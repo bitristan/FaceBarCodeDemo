@@ -109,6 +109,19 @@ public class FontActivity extends Activity implements View.OnClickListener {
         return ret;
     }
 
+    public Bitmap composeBinarization2(Bitmap mergeBitmap, QRCode qrcode, int color) {
+        Bitmap ret = QRCodeUtils.makeWaterQRCodeBt(QRCODE_DEFAULT_CONTENT, QRCODE_DEFAULT_SIZE, mCurrentSelectColort);
+
+        Canvas canvas = new Canvas(ret);
+        Paint paint = new Paint();
+        paint.setDither(true);
+        paint.setAntiAlias(true);
+        paint.setColor(color);
+        canvas.drawBitmap(mergeBitmap, 0, 0, paint);
+
+        return ret;
+    }
+
     public Bitmap composeBinarization1(Bitmap mergeBitmap, QRCode qrcode, int color) {
         int width = QRCODE_DEFAULT_SIZE;
         int height = QRCODE_DEFAULT_SIZE;
