@@ -189,7 +189,7 @@ public class QRCodeUtils {
                 }
             }
 
-            Log.d("getColorOnBitmap", "return Color : " + Integer.toHexString(colorMerge));
+//            Log.d("getColorOnBitmap", "return Color : " + Integer.toHexString(colorMerge));
 
             return colorMerge;
         }
