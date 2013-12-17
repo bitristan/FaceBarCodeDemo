@@ -5,15 +5,20 @@ import android.app.Activity;
 import android.graphics.*;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
+
+import java.util.ArrayList;
 
 /**
  * Created by michael on 13-12-17.
@@ -24,7 +29,7 @@ public class FontActivity extends Activity implements View.OnClickListener {
     private static final int QRCODE_DEFAULT_SIZE = 500;
     private static final float QRCODE_CENTER_AREA_PERCENTAGE = 0.6f;
 
-    private ImageView mImageView;
+    private ViewPager mViewPager;
 
     private EditText mInput;
 
@@ -32,16 +37,22 @@ public class FontActivity extends Activity implements View.OnClickListener {
 
     private ActionBar mActionBar;
 
+    private PagerAdapter mPagerAdapter;
+
     private int mCurrentSelectColort = Color.RED;
 
+    private ArrayList<Bitmap> mData = new ArrayList<Bitmap>();
+
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.font);
 
-        mImageView = (ImageView) findViewById(R.id.image);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
         mInput = (EditText) findViewById(R.id.text);
         mButton = (Button) findViewById(R.id.ok);
-        initUI();
 
         mActionBar = getActionBar();
         mActionBar.setTitle("字体混合");
@@ -49,8 +60,15 @@ public class FontActivity extends Activity implements View.OnClickListener {
         mButton.setOnClickListener(this);
 
         mInput.setText("疆");
-        showQRCode("疆");
+        initUI();
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mData.clear();
+        mViewPager.setAdapter(null);
+        mPagerAdapter = null;
     }
 
     private void initUI() {
@@ -60,6 +78,26 @@ public class FontActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.c4).setOnClickListener(this);
         findViewById(R.id.c5).setOnClickListener(this);
         findViewById(R.id.c6).setOnClickListener(this);
+
+        asyncUpdateUI();
+    }
+
+    private void asyncUpdateUI() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String text = mInput.getText().toString();
+                showQRCode(text);
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPagerAdapter = new QRImageAdapter(getLayoutInflater(), mData);
+                        mViewPager.setAdapter(mPagerAdapter);
+                    }
+                });
+            }
+        }).start();
     }
 
     @Override
@@ -75,13 +113,14 @@ public class FontActivity extends Activity implements View.OnClickListener {
                 mCurrentSelectColort = ((ColorDrawable)v.getBackground()).getColor();
         }
 
-        showQRCode(text);
+        asyncUpdateUI();
     }
 
     private void showQRCode(String text) {
         QRCode qrCode = QRCodeUtils.encodeQrcode(QRCODE_DEFAULT_CONTENT);
         Bitmap show = composeBinarization1(generateFontBt(text, QRCODE_DEFAULT_SIZE, mCurrentSelectColort), qrCode, mCurrentSelectColort);
-        mImageView.setImageBitmap(show);
+        mData.clear();
+        mData.add(show);
     }
 
     public Bitmap generateFontBt(String text, int btSize, int color) {
@@ -141,7 +180,7 @@ public class FontActivity extends Activity implements View.OnClickListener {
         int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
         int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        Log.d("composeBinarization1", String.format("multiple = (%s), leftPadding = (%s), topPadding = (%s)", multiple, leftPadding, topPadding));
+//        Log.d("composeBinarization1", String.format("multiple = (%s), leftPadding = (%s), topPadding = (%s)", multiple, leftPadding, topPadding));
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -163,7 +202,7 @@ public class FontActivity extends Activity implements View.OnClickListener {
                 box.bottom = outputY + multiple;
 
                 int colorOnMergeBt = QRCodeUtils.getColorOnBitmap(mergeBitmap, box, Color.WHITE);
-                Log.d("composeBinarization1", "search color : " + Integer.toHexString(colorOnMergeBt));
+//                Log.d("composeBinarization1", "search color : " + Integer.toHexString(colorOnMergeBt));
                 if (colorOnMergeBt == Color.WHITE) {
                     paint.setColor(color);
                     if (input.get(inputX, inputY) == 1) {

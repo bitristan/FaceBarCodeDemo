@@ -3,6 +3,9 @@ package com.qrcode.sdk;
 import android.graphics.Path;
 import android.graphics.Rect;
 
+/**
+ * 边框装饰父类
+ */
 public abstract class QRBorder {
 
 	protected int mWidth;

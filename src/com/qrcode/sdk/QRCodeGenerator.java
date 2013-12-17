@@ -345,6 +345,7 @@ public class QRCodeGenerator {
 			}
 		}
 
+        //如果有边框，表示内部二维码绘制区域
 		Rect insideRect = null;
 		if (border != null) {
 			canvas.clipPath(border.getClipPath());
@@ -375,11 +376,9 @@ public class QRCodeGenerator {
 		int inputX, inputY;
 		for (int outputY = topPadding; outputY < outputHeight - topPadding; outputY += boxSize) {
 			// 总是取ceil值，避免(-1, 1)之间0出现两次
-			inputY = (int) Math.ceil((outputY - insideRect.top)
-					/ (double) boxSize);
+			inputY = (int) Math.ceil((outputY - insideRect.top) / (double) boxSize);
 			for (int outputX = leftPadding; outputX < outputWidth - leftPadding; outputX += boxSize) {
-				inputX = (int) Math.ceil((outputX - insideRect.left)
-						/ (double) boxSize);
+				inputX = (int) Math.ceil((outputX - insideRect.left) / (double) boxSize);
 
 				if (options.outBackgroundImage != null
 						&& options.outComposeType == ComposeType.ALTERNATIVE) {
@@ -483,8 +482,7 @@ public class QRCodeGenerator {
 							break;
 						}
 
-						paint.setColor(getGradientColor(gradientColor,
-								foregroundColor, ratio));
+						paint.setColor(getGradientColor(gradientColor, foregroundColor, ratio));
 					}
 
 					Shape shape = options.outShape;

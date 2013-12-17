@@ -16,7 +16,9 @@ public class QRCodeOptions {
 	public static final ErrorCorrectionLevel DEFAULT_ERROR_CORRECTION_LEVEL = ErrorCorrectionLevel.H;
 
 	public static enum Shape {
-		NORMAL, ROUND, WATER,
+		NORMAL,
+        ROUND,
+        WATER,
 	}
 
 	public static enum GradientType {
@@ -24,7 +26,14 @@ public class QRCodeOptions {
 	}
 
 	public static enum ComposeType {
-		SIMPLE, ALTERNATIVE,
+        /**
+         * 简单叠加
+         */
+		SIMPLE,
+        /**
+         * 蒙娜丽莎效果
+         */
+        ALTERNATIVE,
 	}
 
 	public static enum BorderType {
@@ -45,7 +54,15 @@ public class QRCodeOptions {
 	public int outGradientColor;
 	public ErrorCorrectionLevel outErrorCorrectionLevel;
 	public Bitmap outBackgroundImage;
+
+    /**
+     * 指定背景图片的合成效果
+     */
 	public ComposeType outComposeType;
+
+    /**
+     * 边框类型
+     */
 	public BorderType outBorderType;
 
 	public QRCodeOptions() {
