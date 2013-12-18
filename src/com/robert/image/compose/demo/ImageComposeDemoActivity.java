@@ -168,7 +168,8 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
 //            detectFace();
 //            Bitmap backgroundBmp = binarization(mOriginal);
             QRCode qrcode = encodeQrcode(null);
-            Bitmap composedBmp = composeBinarization(null, qrcode);
+            //Bitmap composedBmp = composeBinarization(null, qrcode);
+            Bitmap composedBmp = QRCodeUtils.makeFaceQRCodeBt(0, 0, mOriginal);
             mPreviewIv.setImageBitmap(composedBmp);
 
 
