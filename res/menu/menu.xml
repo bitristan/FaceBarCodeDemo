@@ -19,6 +19,12 @@
             android:title="文字描边">
     </item>
 
+    <item
+        android:id="@+id/pixel"
+        android:showAsAction="ifRoom"
+        android:title="像素化">
+    </item>
+
 
     <!--<item-->
     <!--android:id="@+id/detail_action_more"-->

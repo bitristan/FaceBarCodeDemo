@@ -26,5 +26,6 @@
                 android:label="文字处理">
         </activity>
         <activity android:name=".TextCodeActivity"/>
+        <activity android:name=".PixelActivity"/>
     </application>
 </manifest>

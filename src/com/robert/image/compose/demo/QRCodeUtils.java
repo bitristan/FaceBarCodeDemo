@@ -1,9 +1,8 @@
 package com.robert.image.compose.demo;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Rect;
+import android.graphics.*;
+import android.media.FaceDetector;
 import android.text.TextUtils;
 import android.util.Log;
 import com.google.zxing.*;
@@ -34,7 +33,7 @@ public class QRCodeUtils {
 //        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
 //        options.outBorderType = QRCodeOptions.BorderType.ROUND;
         options.outShape = QRCodeOptions.Shape.ROUND;
-        options.outErrorCorrectionLevel= ErrorCorrectionLevel.M;
+        options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
         options.outRadiuspercent = 0.7f;
         options.textSize = textSize;
         options.textContent = textContent;
@@ -60,7 +59,7 @@ public class QRCodeUtils {
 //        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
 //        options.outBorderType = QRCodeOptions.BorderType.ROUND;
         options.outShape = QRCodeOptions.Shape.WATER;
-        options.outErrorCorrectionLevel= ErrorCorrectionLevel.M;
+        options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
         options.outRadiuspercent = 0.7f;
         options.textSize = textSize;
         options.textContent = textContent;
@@ -74,6 +73,46 @@ public class QRCodeUtils {
         }
 
         return null;
+    }
+
+    public static Bitmap mosaic(Bitmap original, int dot) {
+//        Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap bitmap = Bitmap.createBitmap(original.getWidth(), original.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas();
+        canvas.setBitmap(bitmap);
+        Paint paint = new Paint();
+        paint.setDither(true);
+
+        int dotS = dot * dot;
+        int w = original.getWidth();
+        int h = original.getHeight();
+        for (int i = 0; i < w / dot; i++) {
+            for (int j = 0; j < h / dot; j++) {
+                int rr = 0;
+                int gg = 0;
+                int bb = 0;
+                for (int k = 0; k < dot; k++) {
+                    for (int l = 0; l < dot; l++) {
+                        int dotColor = original.getPixel(i * dot + k, j * dot + l);
+                        rr += Color.red(dotColor);
+                        gg += Color.green(dotColor);
+                        bb += Color.blue(dotColor);
+                    }
+                }
+                rr = rr / dotS;
+                gg = gg / dotS;
+                bb = bb / dotS;
+                paint.setColor(Color.rgb(rr, gg, bb));
+                canvas.drawRect(new Rect(i * dot, j * dot, i * dot + dot, j * dot + dot), paint);
+//                for (int k = 0; k < dot; k++) {
+//                    for (int l = 0; l < dot; l++) {
+//                        bitmap.setPixel(i * dot + k, j * dot + l, Color.rgb(rr, gg, bb));
+//                    }
+//                }
+            }
+        }
+
+        return bitmap;
     }
 
     public static QRCode encodeQrcode(String content) {
