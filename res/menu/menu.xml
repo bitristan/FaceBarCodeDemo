@@ -28,13 +28,13 @@
                 android:showAsAction="ifRoom"
                 android:title="像素化">
             </item>
-        </menu>
-    </item>
 
-    <item
-            android:id="@+id/face_compose"
-            android:showAsAction="ifRoom"
-            android:title="人脸合成">
+            <item
+                    android:id="@+id/face_compose"
+                    android:showAsAction="ifRoom"
+                    android:title="人脸合成">
+            </item>
+        </menu>
     </item>
 
     <!--<item-->

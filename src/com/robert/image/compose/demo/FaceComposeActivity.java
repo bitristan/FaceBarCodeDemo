@@ -408,90 +408,6 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         return matrix;
     }
 
-    private Bitmap lightenAndContrast(Bitmap original) {
-        if (original != null) {
-            return original;
-        }
-
-        int width = original.getWidth();
-        int height = original.getHeight();
-
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(result);
-        Paint paint = new Paint();
-        ColorMatrix lightenColorMatrix = new ColorMatrix();
-        lightenColorMatrix.set(new float[]{
-                1, 0, 0, 0, 20,
-                0, 1, 0, 0, 20,
-                0, 0, 1, 0, 20,
-                0, 0, 0, 1, 0
-        });
-        ColorMatrix contrastColorMatrix = new ColorMatrix();
-        float contrastCoefficient = 1.25f;
-        contrastColorMatrix.set(new float[]{
-                contrastCoefficient, 0, 0, 0, 128 * (1 - contrastCoefficient),
-                0, contrastCoefficient, 0, 0, 128 * (1 - contrastCoefficient),
-                0, 0, contrastCoefficient, 0, 128 * (1 - contrastCoefficient),
-                0, 0, 0, 1, 0
-        });
-        lightenColorMatrix.postConcat(contrastColorMatrix);
-        paint.setColorFilter(new ColorMatrixColorFilter(lightenColorMatrix));
-        canvas.drawBitmap(original, 0, 0, paint);
-        return result;
-    }
-
-    public static Bitmap makePointQRCodeBt(String content, int size, int color, String textContent, int textSize) {
-        final QRCodeOptions options = new QRCodeOptions();
-        options.outWidth = size;
-        options.outHeight = size;
-        options.outBackgroundColor = Color.WHITE;
-        options.outForegroundColor = color;
-//        options.outGradientColor = -65528;
-//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
-//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
-        options.outShape = QRCodeOptions.Shape.ROUND;
-        options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
-        options.outRadiuspercent = 0.7f;
-        options.textSize = textSize;
-        options.textContent = textContent;
-
-        QRCodeGenerator QRCodeGenerator = new QRCodeGenerator(content);
-
-        try {
-            return QRCodeGenerator.generate(options);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static Bitmap makeWaterQRCodeBt(String content, int size, int color, String textContent, int textSize) {
-        final QRCodeOptions options = new QRCodeOptions();
-        options.outWidth = size;
-        options.outHeight = size;
-        options.outBackgroundColor = Color.WHITE;
-        options.outForegroundColor = color;
-//        options.outGradientColor = -65528;
-//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
-//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
-        options.outShape = QRCodeOptions.Shape.WATER;
-        options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
-        options.outRadiuspercent = 0.7f;
-        options.textSize = textSize;
-        options.textContent = textContent;
-
-        QRCodeGenerator QRCodeGenerator = new QRCodeGenerator(content);
-
-        try {
-            return QRCodeGenerator.generate(options);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
     /**
      * 二值化
      *
@@ -721,7 +637,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
 //        }
         canvas.drawBitmap(faceBmp, 0, 0, null);
         bottomBmp = binarization(bottomBmp, Color.WHITE, purpleColor);
-        bottomBmp = brightenBitmap(bottomBmp);
+        bottomBmp = mosaic(brightenBitmap(bottomBmp));
 
         Bitmap topBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(topBmp);
@@ -813,7 +729,6 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         canvas.drawBitmap(topBmp, 0, 0, null);
         return bitmap;
         //return bottomBmp;
-        //return bottomBmp;
     }
 
     public Bitmap brightenBitmap(Bitmap original) {
@@ -903,5 +818,41 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         }
         return false;
     }
+
+
+    private Bitmap mosaic(Bitmap original) {
+        int width = original.getWidth();
+        int height = original.getHeight();
+        Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
+
+        int dot = 5;
+        for (int i = 0; i < width / dot; i++) {
+            for (int j = 0; j < height / dot; j++) {
+                int rr = 0;
+                int gg = 0;
+                int bb = 0;
+                for (int k = 0; k < dot; k++) {
+                    for (int l = 0; l < dot; l++) {
+                        int dotColor = original.getPixel(i * dot + k, j
+                                * dot + l);
+                        rr += Color.red(dotColor);
+                        gg += Color.green(dotColor);
+                        bb += Color.blue(dotColor);
+                    }
+                }
+                rr = rr / (dot * dot);
+                gg = gg / (dot * dot);
+                bb = bb / (dot * dot);
+                for (int k = 0; k < dot; k++) {
+                    for (int l = 0; l < dot; l++) {
+                        bitmap.setPixel(i * dot + k, j * dot + l,
+                                Color.rgb(rr, gg, bb));
+                    }
+                }
+            }
+        }
+        return bitmap;
+    }
+
 
 }
