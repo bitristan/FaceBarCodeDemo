@@ -27,5 +27,6 @@
         </activity>
         <activity android:name=".TextCodeActivity"/>
         <activity android:name=".FaceComposeActivity"/>
+        <activity android:name=".PixelActivity"/>
     </application>
 </manifest>

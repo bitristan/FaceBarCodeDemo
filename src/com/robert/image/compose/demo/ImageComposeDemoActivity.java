@@ -27,8 +27,8 @@ import java.io.*;
 public class ImageComposeDemoActivity extends Activity implements View.OnClickListener {
     private static final int MAX_FACES = 1;
 
-    private static final String QRCODE_DEFAULT_CONTENT = "BEGIN:VCARD\nVERSION:3.0\nFN:Ting\nPHOTO;VALUE=uri:http://tp3.sinaimg.cn/1668659954/180/5679291057/1\nTEL;CELL;VOICE:18612560521\nURL:http://lzem.me\nEND:VCARD";
-    private static final int QRCODE_DEFAULT_SIZE = 500;
+    public static final String QRCODE_DEFAULT_CONTENT = "BEGIN:VCARD\nVERSION:3.0\nFN:Ting\nPHOTO;VALUE=uri:http://tp3.sinaimg.cn/1668659954/180/5679291057/1\nTEL;CELL;VOICE:18612560521\nURL:http://lzem.me\nEND:VCARD";
+    public static final int QRCODE_DEFAULT_SIZE = 500;
     private static final float QRCODE_CENTER_AREA_PERCENTAGE = 0.4f;
 
     private static final String IMAGE_DIR = "image";
@@ -107,6 +107,8 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
             case R.id.face_compose:
                 startActivity(new Intent(this, FaceComposeActivity.class));
                 break;
+            case R.id.pixel:
+                startActivity(new Intent(this, PixelActivity.class));
             default:
                 break;
         }

@@ -1,5 +1,6 @@
 package com.robert.image.compose.demo;
 
+import android.content.Context;
 import android.graphics.*;
 import android.media.FaceDetector;
 import android.text.TextUtils;
@@ -73,6 +74,46 @@ public class QRCodeUtils {
         }
 
         return null;
+    }
+
+    public static Bitmap mosaic(Bitmap original, int outWidth, int outHeight, int dot) {
+        Bitmap bitmap = Bitmap.createScaledBitmap(original, outWidth, outHeight, false);
+        Canvas canvas = new Canvas();
+        canvas.setBitmap(bitmap);
+        Paint paint = new Paint();
+        paint.setDither(true);
+
+        int dotS = dot * dot;
+        int w_count = outWidth / dot;
+        int h_count = outHeight / dot;
+
+        for (int i = 0; i < w_count; i++) {
+            for (int j = 0; j < h_count; j++) {
+                int rr = 0;
+                int gg = 0;
+                int bb = 0;
+                for (int k = 0; k < dot; k++) {
+                    for (int l = 0; l < dot; l++) {
+                        int dotColor = bitmap.getPixel(i * dot + k, j * dot + l);
+                        rr += Color.red(dotColor);
+                        gg += Color.green(dotColor);
+                        bb += Color.blue(dotColor);
+                    }
+                }
+                rr = rr / dotS;
+                gg = gg / dotS;
+                bb = bb / dotS;
+                paint.setColor(Color.rgb(rr, gg, bb));
+                canvas.drawRect(new Rect(i * dot, j * dot, i * dot + dot, j * dot + dot), paint);
+//                for (int k = 0; k < dot; k++) {
+//                    for (int l = 0; l < dot; l++) {
+//                        bitmap.setPixel(i * dot + k, j * dot + l, Color.rgb(rr, gg, bb));
+//                    }
+//                }
+            }
+        }
+
+        return bitmap;
     }
 
     public static QRCode encodeQrcode(String content) {
