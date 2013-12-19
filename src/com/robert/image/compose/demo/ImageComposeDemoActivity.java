@@ -104,6 +104,9 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
             case R.id.text_stroke:
                 startActivity(new Intent(this, TextCodeActivity.class));
                 break;
+            case R.id.face_compose:
+                startActivity(new Intent(this, FaceComposeActivity.class));
+                break;
             default:
                 break;
         }
@@ -168,8 +171,7 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
 //            detectFace();
 //            Bitmap backgroundBmp = binarization(mOriginal);
             QRCode qrcode = encodeQrcode(null);
-            //Bitmap composedBmp = composeBinarization(null, qrcode);
-            Bitmap composedBmp = QRCodeUtils.makeFaceQRCodeBt(0, 0, mOriginal);
+            Bitmap composedBmp = composeBinarization(null, qrcode);
             mPreviewIv.setImageBitmap(composedBmp);
 
 
