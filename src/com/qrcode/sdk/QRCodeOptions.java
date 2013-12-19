@@ -22,7 +22,12 @@ public class QRCodeOptions {
 	}
 
 	public static enum GradientType {
-		NORMAL, ROUND, SLASH, BACKSLASH, HORIZONTAL, VERTICAL,
+		NORMAL,
+        ROUND,
+        SLASH,
+        BACKSLASH,
+        HORIZONTAL,
+        VERTICAL,
 	}
 
 	public static enum ComposeType {

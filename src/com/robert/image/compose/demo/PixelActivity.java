@@ -10,6 +10,8 @@ import android.util.Log;
 import android.widget.ImageView;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.qrcode.r.sdk.QRCodeGenerator;
+import com.qrcode.r.sdk.QRCodeOptions;
 
 
 /**
@@ -30,7 +32,7 @@ public class PixelActivity extends Activity {
         mInImageView = (ImageView) findViewById(R.id.in);
         mOutImageView = (ImageView) findViewById(R.id.out);
 
-        asyncLoadImage(Environment.getExternalStorageDirectory() + "/test/009.jpg");
+        asyncLoadImage(Environment.getExternalStorageDirectory() + "/test/test.jpg");
     }
 
     private void asyncLoadImage(final String path) {
@@ -47,10 +49,17 @@ public class PixelActivity extends Activity {
 //                            Bitmap pixel = QRCodeUtils.mosaic(org, 100);
                             long end = System.currentTimeMillis();
                             Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] END current time : " + end);
-                            Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] cost : (" + (end - begin)/1000 + ")s");
+                            Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] cost : (" + (end - begin) / 1000 + ")s");
                             mInImageView.setImageBitmap(org);
-                            mOutImageView.setImageBitmap(makePixelQRCode(Config.QRCODE_CONTENT, org, Config.QRCODE_DEFAULT_SIZE));
-//                            mInImageView.setImageBitmap(QRCodeUtils.mosaic(Bitmap.createScaledBitmap(org, Config.QRCODE_DEFAULT_SIZE, Config.QRCODE_DEFAULT_SIZE, false), 13));
+
+                            QRCodeOptions opt = new QRCodeOptions();
+                            opt.backgroundBitmap = org;
+                            opt.qrCodeRelaeseEffect = QRCodeOptions.QRCodeRelaeseEffect.PIXEL;
+                            opt.qrContent = Config.QRCODE_CONTENT;
+                            opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
+                            QRCodeGenerator.createQRCode(opt);
+//                            mOutImageView.setImageBitmap(makePixelQRCode(Config.QRCODE_CONTENT, org, Config.QRCODE_DEFAULT_SIZE));
+                            mOutImageView.setImageBitmap(QRCodeGenerator.createQRCode(opt));
                         }
                     });
                 }
@@ -101,9 +110,9 @@ public class PixelActivity extends Activity {
         //对比度
         float contrast = (float) ((10 + 64) / 128.0);
         ColorMatrix cMatrix = new ColorMatrix();
-        cMatrix.set(new float[] { contrast, 0, 0, 0, 0, 0,
-                                    contrast, 0, 0, 0,// 改变对比度
-                                    0, 0, contrast, 0, 0, 0, 0, 0, 1, 0 });
+        cMatrix.set(new float[]{contrast, 0, 0, 0, 0, 0,
+                                   contrast, 0, 0, 0,// 改变对比度
+                                   0, 0, contrast, 0, 0, 0, 0, 0, 1, 0});
         allMatrix.postConcat(cMatrix);
 //
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
@@ -121,13 +130,9 @@ public class PixelActivity extends Activity {
                 box.top = outputY;
                 box.bottom = outputY + multiple;
 
-//                if (isInArea(outputX, outputY, centerArea) && qrcodeFaceBmp != null && !isAreaBounds(outputX, outputY, centerArea)) {
-//                    canvas.drawBitmap(qrcodeFaceBmp, faceBox, box, paint);
-//                } else {
-                    if (input.get(inputX, inputY) == 1) {
-                        canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
-                    }
-//                }
+                if (input.get(inputX, inputY) == 1) {
+                    canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                }
             }
         }
 
