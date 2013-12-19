@@ -75,25 +75,25 @@ public class QRCodeUtils {
         return null;
     }
 
-    public static Bitmap mosaic(Bitmap original, int dot) {
-//        Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
-        Bitmap bitmap = Bitmap.createBitmap(original.getWidth(), original.getHeight(), Bitmap.Config.ARGB_8888);
+    public static Bitmap mosaic(Bitmap original, int outWidth, int outHeight, int dot) {
+        Bitmap bitmap = Bitmap.createScaledBitmap(original, outWidth, outHeight, false);
         Canvas canvas = new Canvas();
         canvas.setBitmap(bitmap);
         Paint paint = new Paint();
         paint.setDither(true);
 
         int dotS = dot * dot;
-        int w = original.getWidth();
-        int h = original.getHeight();
-        for (int i = 0; i < w / dot; i++) {
-            for (int j = 0; j < h / dot; j++) {
+        int w_count = outWidth / dot;
+        int h_count = outHeight / dot;
+
+        for (int i = 0; i < w_count; i++) {
+            for (int j = 0; j < h_count; j++) {
                 int rr = 0;
                 int gg = 0;
                 int bb = 0;
                 for (int k = 0; k < dot; k++) {
                     for (int l = 0; l < dot; l++) {
-                        int dotColor = original.getPixel(i * dot + k, j * dot + l);
+                        int dotColor = bitmap.getPixel(i * dot + k, j * dot + l);
                         rr += Color.red(dotColor);
                         gg += Color.green(dotColor);
                         bb += Color.blue(dotColor);

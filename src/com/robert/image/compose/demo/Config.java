@@ -7,4 +7,5 @@ public class Config {
 
     public static final String QRCODE_CONTENT = "http://roundqr.sinaapp.com/index.php";
 
+    public static final int QRCODE_DEFAULT_SIZE = 500;
 }

@@ -10,7 +10,6 @@ import android.util.Log;
 import android.widget.ImageView;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
-import com.qrcode.sdk.QRCodeUtil;
 
 
 /**
@@ -31,7 +30,7 @@ public class PixelActivity extends Activity {
         mInImageView = (ImageView) findViewById(R.id.in);
         mOutImageView = (ImageView) findViewById(R.id.out);
 
-        asyncLoadImage(Environment.getExternalStorageDirectory() + "/test/test.jpg");
+        asyncLoadImage(Environment.getExternalStorageDirectory() + "/test/009.jpg");
     }
 
     private void asyncLoadImage(final String path) {
@@ -50,7 +49,8 @@ public class PixelActivity extends Activity {
                             Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] END current time : " + end);
                             Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] cost : (" + (end - begin)/1000 + ")s");
                             mInImageView.setImageBitmap(org);
-                            mOutImageView.setImageBitmap(makePixelQRCode(Config.QRCODE_CONTENT, org));
+                            mOutImageView.setImageBitmap(makePixelQRCode(Config.QRCODE_CONTENT, org, Config.QRCODE_DEFAULT_SIZE));
+//                            mInImageView.setImageBitmap(QRCodeUtils.mosaic(Bitmap.createScaledBitmap(org, Config.QRCODE_DEFAULT_SIZE, Config.QRCODE_DEFAULT_SIZE, false), 13));
                         }
                     });
                 }
@@ -58,10 +58,8 @@ public class PixelActivity extends Activity {
         }).start();
     }
 
-    private Bitmap makePixelQRCode(String qrContent, Bitmap background) {
+    private Bitmap makePixelQRCode(String qrContent, Bitmap background, int defaultQRCodeSize) {
         QRCode qrCode = QRCodeUtils.encodeQrcode(qrContent);
-        int width = ImageComposeDemoActivity.QRCODE_DEFAULT_SIZE;
-        int height = ImageComposeDemoActivity.QRCODE_DEFAULT_SIZE;
 
         ByteMatrix input = qrCode.getMatrix();
         if (input == null) {
@@ -71,41 +69,48 @@ public class PixelActivity extends Activity {
         int inputHeight = input.getHeight();
         int qrWidth = inputWidth;
         int qrHeight = inputHeight;
-        int outputWidth = Math.max(width, qrWidth);
-        int outputHeight = Math.max(height, qrHeight);
+        int outputWidth = Math.max(defaultQRCodeSize, qrWidth);
+        int outputHeight = Math.max(defaultQRCodeSize, qrHeight);
 
         int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
-        int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
-        int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-        Bitmap scaleBt = Bitmap.createScaledBitmap(background, width, height, false);
-        Bitmap pixelBt = QRCodeUtils.mosaic(scaleBt, multiple);
+        //四周各空两个点整
+        int realWidth = multiple * (inputWidth + 4);
+        int realHeight = multiple * (inputHeight + 4);
+
+        int leftPadding = multiple * 2;
+        int topPadding = multiple * 2;
+
+        Bitmap pixelBt = QRCodeUtils.mosaic(background, realWidth, realHeight, multiple);
         pixelBt.setHasAlpha(true);
-        scaleBt.recycle();
 
-        Bitmap out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap out = Bitmap.createBitmap(realWidth, realHeight, Bitmap.Config.ARGB_8888);
+        out.setHasAlpha(true);
         Canvas canvas = new Canvas(out);
-        canvas.drawColor(Color.WHITE);
+        canvas.drawARGB(200, 255, 255, 255);
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
 
-        paint.setAlpha(180);
+        paint.setAlpha(150);
         ColorMatrix allMatrix = new ColorMatrix();
         ColorMatrix colorMatrix = new ColorMatrix();
-        colorMatrix.setSaturation(8);
+//        //饱和度
+        colorMatrix.setSaturation(6);
         allMatrix.postConcat(colorMatrix);
+        //对比度
         float contrast = (float) ((10 + 64) / 128.0);
         ColorMatrix cMatrix = new ColorMatrix();
         cMatrix.set(new float[] { contrast, 0, 0, 0, 0, 0,
                                     contrast, 0, 0, 0,// 改变对比度
                                     0, 0, contrast, 0, 0, 0, 0, 0, 1, 0 });
         allMatrix.postConcat(cMatrix);
-
+//
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
-        paint.setAlpha(155);
+        paint.setColorFilter(null);
+        paint.setAlpha(160);
 
         Rect box = new Rect();
 
