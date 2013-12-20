@@ -33,6 +33,7 @@ public class QRCodeOptions {
      */
     public static enum QRCodeRelaeseEffect {
         PIXEL,
+        PIXEL_Border,
     }
 
     public QRCodeRelaeseEffect qrCodeRelaeseEffect;

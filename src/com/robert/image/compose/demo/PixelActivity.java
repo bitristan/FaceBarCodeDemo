@@ -2,17 +2,26 @@ package com.robert.image.compose.demo;
 
 import android.app.Activity;
 import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Toast;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.qrcode.r.sdk.QRCodeGenerator;
 import com.qrcode.r.sdk.QRCodeOptions;
-
 
 /**
  * Created by michael on 13-12-18.
@@ -20,8 +29,14 @@ import com.qrcode.r.sdk.QRCodeOptions;
 public class PixelActivity extends Activity {
 
     private ImageView mInImageView;
-
     private ImageView mOutImageView;
+    private ImageView mInImageView1;
+    private ImageView mOutImageView1;
+
+    private Bitmap mQRCodeBt;
+    private Bitmap mQRCodeBt1;
+
+    private ViewPager mViewPager;
 
     private Handler mHandler = new Handler(Looper.myLooper());
 
@@ -29,10 +44,72 @@ public class PixelActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.pixel_activity);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+
+        mViewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return 2;
+            }
+
+            @Override
+            public boolean isViewFromObject(View view, Object o) {
+                return view == o;
+            }
+
+            @Override
+            public void destroyItem(View arg0, int arg1, Object arg2) {
+                ((ViewGroup) arg0).removeView((View) arg2);
+            }
+
+            @Override
+            public Object instantiateItem(View arg0, int pos) {
+                View ret = getLayoutInflater().inflate(R.layout.pixel_one, null);
+                switch (pos) {
+                    case 0:
+                        mOutImageView = (ImageView) ret.findViewById(R.id.out);
+                        mInImageView = (ImageView) ret.findViewById(R.id.in);
+                        break;
+                    case 1:
+                        mOutImageView1 = (ImageView) ret.findViewById(R.id.out);
+                        mInImageView1 = (ImageView) ret.findViewById(R.id.in);
+                        break;
+                }
+                ((ViewPager) arg0).addView(ret);
+
+                return ret;
+            }
+        });
+
         mInImageView = (ImageView) findViewById(R.id.in);
         mOutImageView = (ImageView) findViewById(R.id.out);
 
         asyncLoadImage(Environment.getExternalStorageDirectory() + "/test/test.jpg");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.pixedl, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save:
+//                File outPath = new File("/sdcard/qrcode_image/");
+//                if (!outPath.exists()) {
+//                    outPath.mkdir();
+//                }
+//                Utils.saveBitmapToFile(mQRCodeBt, outPath.getAbsolutePath() + "/pixel.jpg");
+                new Thread(new Utils.SaveRunnable(getApplicationContext(), mQRCodeBt)).start();
+
+                Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_LONG).show();
+                break;
+        }
+
+        return true;
     }
 
     private void asyncLoadImage(final String path) {
@@ -58,8 +135,18 @@ public class PixelActivity extends Activity {
                             opt.qrContent = Config.QRCODE_CONTENT;
                             opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                             QRCodeGenerator.createQRCode(opt);
-//                            mOutImageView.setImageBitmap(makePixelQRCode(Config.QRCODE_CONTENT, org, Config.QRCODE_DEFAULT_SIZE));
-                            mOutImageView.setImageBitmap(QRCodeGenerator.createQRCode(opt));
+                            mQRCodeBt = QRCodeGenerator.createQRCode(opt);
+                            mOutImageView.setImageBitmap(mQRCodeBt);
+
+                            QRCodeOptions opt1 = new QRCodeOptions();
+                            opt1.backgroundBitmap = org;
+                            opt1.qrCodeRelaeseEffect = QRCodeOptions.QRCodeRelaeseEffect.PIXEL_Border;
+                            opt1.qrContent = Config.QRCODE_CONTENT;
+                            opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
+                            QRCodeGenerator.createQRCode(opt1);
+                            mQRCodeBt = QRCodeGenerator.createQRCode(opt1);
+                            mOutImageView1.setImageBitmap(mQRCodeBt);
+                            mInImageView1.setImageBitmap(org);
                         }
                     });
                 }
@@ -68,6 +155,10 @@ public class PixelActivity extends Activity {
     }
 
     private Bitmap makePixelQRCode(String qrContent, Bitmap background, int defaultQRCodeSize) {
+        //preview bt
+        Bitmap pre = ((BitmapDrawable) getResources().getDrawable(R.drawable.pre)).getBitmap();
+
+
         QRCode qrCode = QRCodeUtils.encodeQrcode(qrContent);
 
         ByteMatrix input = qrCode.getMatrix();
@@ -108,7 +199,7 @@ public class PixelActivity extends Activity {
         colorMatrix.setSaturation(6);
         allMatrix.postConcat(colorMatrix);
         //对比度
-        float contrast = (float) ((10 + 64) / 128.0);
+        float contrast = (float) (140 / 128.0);
         ColorMatrix cMatrix = new ColorMatrix();
         cMatrix.set(new float[]{contrast, 0, 0, 0, 0, 0,
                                    contrast, 0, 0, 0,// 改变对比度
@@ -118,6 +209,11 @@ public class PixelActivity extends Activity {
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
+
+//        paint.setAlpha(100);
+//        Rect preRect = new Rect(0, 0, pre.getWidth(), pre.getHeight());
+//        canvas.drawBitmap(pre, preRect, new Rect(0, 0, realWidth, realHeight), paint);
+
         paint.setColorFilter(null);
         paint.setAlpha(160);
 

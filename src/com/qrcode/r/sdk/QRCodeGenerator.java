@@ -1,7 +1,6 @@
 package com.qrcode.r.sdk;
 
 import android.graphics.Bitmap;
-import android.text.TextUtils;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
@@ -14,6 +13,9 @@ public class QRCodeGenerator {
 
         if (opt.qrCodeRelaeseEffect == QRCodeOptions.QRCodeRelaeseEffect.PIXEL) {
             QREffectInterface obj = new PixelQREffect();
+            return obj.makeEffectQRCode(opt.qrContent, opt);
+        } else if (opt.qrCodeRelaeseEffect == QRCodeOptions.QRCodeRelaeseEffect.PIXEL_Border) {
+            QREffectInterface obj = new PixelBorderQREffect();
             return obj.makeEffectQRCode(opt.qrContent, opt);
         }
 

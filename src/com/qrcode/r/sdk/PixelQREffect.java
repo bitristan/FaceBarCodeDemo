@@ -83,7 +83,7 @@ public class PixelQREffect implements QREffectInterface {
         return out;
     }
 
-    public static Bitmap mosaic(Bitmap original, int outWidth, int outHeight, int dot) {
+    protected static Bitmap mosaic(Bitmap original, int outWidth, int outHeight, int dot) {
         Bitmap bitmap = Bitmap.createScaledBitmap(original, outWidth, outHeight, false);
         Canvas canvas = new Canvas();
         canvas.setBitmap(bitmap);
