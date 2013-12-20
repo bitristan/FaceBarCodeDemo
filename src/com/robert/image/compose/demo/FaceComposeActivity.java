@@ -110,7 +110,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                     mOriginalIv.setImageBitmap(mOriginal);
 
                     QRCode qrcode = encodeQrcode(null);
-                    Bitmap composedBmp = composeBinarization(null, qrcode);
+                    Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, null);
                     mPreviewIv.setImageBitmap(composedBmp);
                     break;
             }
@@ -146,45 +146,14 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
             mOriginalIv.setImageBitmap(mOriginal);
 
             long start = System.nanoTime();
-
-//            Bitmap faceAreaBmp = cutFace();
-//            if (faceAreaBmp != null) {
-//                mSkinArea = detectSkinArea(faceAreaBmp);
-//                faceAreaBmp = showSkinArea(mSkinArea);
-//            }
-
-//            detectFace();
-//            Bitmap backgroundBmp = binarization(mOriginal);
             QRCode qrcode = encodeQrcode(null);
-            //Bitmap composedBmp = composeBinarization(null, qrcode);
             Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, point);
             mPreviewIv.setImageBitmap(composedBmp);
-
-
-//            Bitmap bitmap = showSkinArea(mSkinArea);
-//            mPreviewIv.setImageBitmap(bitmap);
             long end = System.nanoTime();
             System.out.println("total time is: " + (end - start));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public Bitmap cutFace() {
-        int count = detectFace();
-        if (count <= 0) {
-            return null;
-        }
-
-        RectF rectF = caculateFaceRect();
-        Rect rect = new Rect((int) rectF.left, (int) rectF.top, (int) rectF.right, (int) rectF.bottom);
-
-        int width = rect.right - rect.left;
-        int height = rect.bottom - rect.top;
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawBitmap(mOriginal, rect, new RectF(0, 0, width, height), null);
-        return bitmap;
     }
 
     public RectF caculateFaceRect() {
@@ -202,85 +171,6 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         rect.bottom = mCenterPoint.y + height / 2 + height / 4;
 
         return rect;
-    }
-
-    private boolean isFace(int outputX, int outputY, RectF faceArea) {
-//        if (!mSkinArea.get(outputX, outputY)) {
-//            return false;
-//        }
-
-        if (outputX > faceArea.left && outputX < faceArea.right && outputY > faceArea.top
-                && outputY < faceArea.bottom) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public Bitmap composeBinarization(Bitmap backgroundBmp, QRCode qrcode) {
-        //int width = backgroundBmp.getWidth();
-        //int height = backgroundBmp.getHeight();
-        int width = QRCODE_DEFAULT_SIZE;
-        int height = QRCODE_DEFAULT_SIZE;
-
-        ByteMatrix input = qrcode.getMatrix();
-        if (input == null) {
-            throw new IllegalStateException();
-        }
-        int inputWidth = input.getWidth();
-        int inputHeight = input.getHeight();
-        int qrWidth = inputWidth;
-        int qrHeight = inputHeight;
-        int outputWidth = Math.max(width, qrWidth);
-        int outputHeight = Math.max(height, qrHeight);
-
-        int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
-        int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
-        int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
-
-        int centerSize = (int) (width * QRCODE_CENTER_AREA_PERCENTAGE);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Bitmap faceAreaBmp = cutFace();
-        if (faceAreaBmp == null) {
-            faceAreaBmp = mOriginal;
-        }
-        Bitmap qrcodeFaceBmp = null;
-        qrcodeFaceBmp = Bitmap.createScaledBitmap(faceAreaBmp, centerSize, centerSize, false);
-        qrcodeFaceBmp = binarization(qrcodeFaceBmp);
-        Canvas canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.WHITE);
-        Paint paint = new Paint();
-        paint.setDither(true);
-        paint.setAntiAlias(true);
-        paint.setColor(Color.RED);
-
-        Rect box = new Rect();
-        Rect faceBox = new Rect();
-        Rect centerArea = new Rect((width - centerSize) / 2, (height - centerSize) / 2, (width + centerSize) / 2, (height + centerSize) / 2);
-
-        for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
-            for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
-                box.left = outputX;
-                box.right = outputX + multiple;
-                box.top = outputY;
-                box.bottom = outputY + multiple;
-
-                faceBox.left = outputX - centerArea.left;
-                faceBox.top = outputY - centerArea.top;
-                faceBox.right = faceBox.left + multiple;
-                faceBox.bottom = faceBox.top + multiple;
-
-                if (isInArea(outputX, outputY, centerArea) && qrcodeFaceBmp != null && !isAreaBounds(outputX, outputY, centerArea)) {
-                    canvas.drawBitmap(qrcodeFaceBmp, faceBox, box, paint);
-                } else {
-                    if (input.get(inputX, inputY) == 1) {
-                        canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
-                    }
-                }
-            }
-        }
-
-        return bitmap;
     }
 
     public QRCode encodeQrcode(String content) {
@@ -319,11 +209,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                     }
                 }
             }
-            FileOutputStream fos = new FileOutputStream(new File("/sdcard/test/out.jpg"));
-            result.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         } catch (NotFoundException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -347,7 +233,6 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         }
 
         bitmap.recycle();
-        bitmap = null;
 
         return count;
     }
@@ -560,7 +445,19 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         float centerPercent = 0.4f;
         int purpleColor = Color.parseColor("#6700d8");
 
-        faceBmp = Bitmap.createScaledBitmap(faceBmp, width, width, false);
+        // width=height的图不需要分别处理
+        if (faceBmp.getWidth() > faceBmp.getHeight()) {
+            if (faceBmp.getWidth() > width) {
+                faceBmp = Bitmap.createScaledBitmap(faceBmp, width, width * faceBmp.getHeight() / faceBmp.getWidth(), false);
+            }
+        } else {
+            if (faceBmp.getHeight() > width) {
+                faceBmp = Bitmap.createScaledBitmap(faceBmp, width * faceBmp.getWidth() / faceBmp.getHeight(), width, false);
+            }
+        }
+
+        int faceLeftPos = (width - faceBmp.getWidth()) / 2;
+        int faceTopPos = (width - faceBmp.getHeight()) / 2;
 
         QRCode qrcode = encodeQrcode("hello, worldskldf;klsfjlsjfsfjpweriupqwruwperuw");
         ByteMatrix input = qrcode.getMatrix();
@@ -593,10 +490,10 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
             if (Math.abs(eyesDistance) > 0.000001) {
                 float horizentalW = eyesDistance * 5 / 2;
                 float verticalH = eyesDistance * 3 / (2 * 0.7f);
-                faceRect.left = (int) (centerPoint.x - horizentalW / 2);
-                faceRect.top = (int) (centerPoint.y - verticalH / 2);
-                faceRect.right = (int) (centerPoint.x + horizentalW / 2);
-                faceRect.bottom = (int) (centerPoint.y + verticalH / 2 + verticalH / 4);
+                faceRect.left = (int) (centerPoint.x - horizentalW / 2) + faceLeftPos;
+                faceRect.top = (int) (centerPoint.y - verticalH / 2) + faceTopPos;
+                faceRect.right = (int) (centerPoint.x + horizentalW / 2) + faceLeftPos;
+                faceRect.bottom = (int) (centerPoint.y + verticalH / 2 + verticalH / 4) + faceTopPos;
             }
         }
         detectFaceBmp.recycle();
@@ -609,35 +506,25 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
             faceScaleCoefficient = (float) maxCenterSize / faceRect.width();
         }
 
+        if (!hasFace) {
+            faceBmp = Bitmap.createScaledBitmap(faceBmp, maxCenterSize, maxCenterSize, false);
+            faceLeftPos = (width - faceBmp.getWidth()) / 2;
+            faceTopPos = (width - faceBmp.getHeight()) / 2;
+        }
+
         Bitmap bottomBmp = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-        bottomBmp.eraseColor(Color.WHITE);
         Canvas canvas = new Canvas(bottomBmp);
+        canvas.drawColor(Color.WHITE);
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
         paint.setColor(Color.RED);
 
-//        if (hasFace) {
-//            if (Math.abs(faceScaleCoefficient - 1.0f) > 0.0001) {
-//                int scaledWidth = (int) (faceScaleCoefficient * faceBmp.getWidth());
-//                int scaledHeight = (int) (faceScaleCoefficient * faceBmp.getHeight());
-//                Bitmap scaledFaceBmp = Bitmap.createScaledBitmap(faceBmp, scaledWidth, scaledHeight, false);
-//                int posX = width / 2 - scaledWidth / 2;
-//                int posY = width / 2 - scaledHeight / 2;
-//                canvas.drawBitmap(scaledFaceBmp, posX, posY, null);
-//                faceRect.left = (int) (posX + faceRect.left * faceScaleCoefficient);
-//                faceRect.top = (int) (posY + faceRect.top * faceScaleCoefficient);
-//                faceRect.right = faceRect.left + faceRect.width();
-//                faceRect.bottom = faceRect.top + faceRect.height();
-//            } else {
-//                canvas.drawBitmap(faceBmp, (width - faceBmp.getWidth()) / 2, (height - faceBmp.getHeight()) / 2, null);
-//            }
-//        } else {
-//            canvas.drawBitmap(faceBmp, (width - faceBmp.getWidth()) / 2, (height - faceBmp.getHeight()) / 2, null);
-//        }
-        canvas.drawBitmap(faceBmp, 0, 0, null);
-        bottomBmp = binarization(bottomBmp, Color.WHITE, purpleColor);
-        bottomBmp = mosaic(brightenBitmap(bottomBmp));
+        faceBmp = binarization(faceBmp, Color.WHITE, purpleColor);
+        faceBmp = brightenBitmap(faceBmp);
+        //bottomBmp = binarization(bottomBmp, Color.WHITE, purpleColor);
+        //bottomBmp = mosaic(brightenBitmap(bottomBmp));
+        canvas.drawBitmap(faceBmp, faceLeftPos, faceTopPos, null);
 
         Bitmap topBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(topBmp);
