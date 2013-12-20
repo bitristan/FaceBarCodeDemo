@@ -14,14 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.qrcode.r.sdk.QRCodeGenerator;
-import com.qrcode.r.sdk.QRCodeOptions;
+import com.qrcode.r.sdk.QRCodeOptionsInterface;
+import com.qrcode.r.sdk.QRCodePixelOptions;
 
 /**
  * Created by michael on 13-12-18.
@@ -116,7 +116,8 @@ public class PixelActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final Bitmap org = BitmapFactory.decodeFile(path);
+//                final Bitmap org = BitmapFactory.decodeFile(path);
+                final Bitmap org = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.test1))).getBitmap();
                 if (org != null) {
                     mHandler.post(new Runnable() {
                         @Override
@@ -129,23 +130,36 @@ public class PixelActivity extends Activity {
                             Log.d("asyncLoadImage", "[[PixelActivity::asyncLoadImage]] cost : (" + (end - begin) / 1000 + ")s");
                             mInImageView.setImageBitmap(org);
 
-                            QRCodeOptions opt = new QRCodeOptions();
+                            QRCodePixelOptions opt = new QRCodePixelOptions();
                             opt.backgroundBitmap = org;
-                            opt.qrCodeRelaeseEffect = QRCodeOptions.QRCodeRelaeseEffect.PIXEL;
+                            opt.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL;
                             opt.qrContent = Config.QRCODE_CONTENT;
                             opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
+//                            opt.errorLevel = ErrorCorrectionLevel;
+                            opt.maskBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.qqq))).getBitmap();
+                            opt.maskRectCount = 2;
+                            opt.frontBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f_1))).getBitmap();
                             QRCodeGenerator.createQRCode(opt);
                             mQRCodeBt = QRCodeGenerator.createQRCode(opt);
                             mOutImageView.setImageBitmap(mQRCodeBt);
 
-                            QRCodeOptions opt1 = new QRCodeOptions();
+                            QRCodePixelOptions opt1 = new QRCodePixelOptions();
                             opt1.backgroundBitmap = org;
-                            opt1.qrCodeRelaeseEffect = QRCodeOptions.QRCodeRelaeseEffect.PIXEL_Border;
+                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL_Border;
                             opt1.qrContent = Config.QRCODE_CONTENT;
                             opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
+                            opt1.errorLevel = ErrorCorrectionLevel.M;
                             QRCodeGenerator.createQRCode(opt1);
-                            mQRCodeBt = QRCodeGenerator.createQRCode(opt1);
-                            mOutImageView1.setImageBitmap(mQRCodeBt);
+                            mQRCodeBt1 = QRCodeGenerator.createQRCode(opt1);
+//                            QRCodePixelOptions opt1 = new QRCodePixelOptions();
+//                            opt1.backgroundBitmap = org;
+//                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL;
+//                            opt1.qrContent = Config.QRCODE_CONTENT;
+//                            opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
+//                            opt1.preBt = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre3))).getBitmap();
+//                            opt1.preSize = 3;
+//                            opt1.preF = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f))).getBitmap();
+                            mOutImageView1.setImageBitmap(mQRCodeBt1);
                             mInImageView1.setImageBitmap(org);
                         }
                     });

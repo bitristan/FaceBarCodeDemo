@@ -12,25 +12,16 @@ public abstract class QRBorder {
 
     protected int mHeight;
 
-    protected int mLeftPadding;
-
-    protected int mTopPadding;
-
     protected Rect mInsideRect;
 
     protected int mBoxSize;
 
-    public QRBorder(int width, int height) {
-        mWidth = width;
-        mHeight = height;
-    }
+    protected int mWidthLeftBoxCount;
+    protected int mWidthRightBoxCount;
+    protected int mHeightTopBoxCount;
+    protected int mHeightBottomBoxCount;
 
-    public int getLeftPadding() {
-        return mLeftPadding;
-    }
-
-    public int getTopPadding() {
-        return mTopPadding;
+    public QRBorder() {
     }
 
     public int getWidth() {
@@ -51,4 +42,11 @@ public abstract class QRBorder {
 
     public abstract Path getClipPath();
 
+    public int getWidthExtendBoxCount() {
+        return mWidthLeftBoxCount;
+    }
+
+    public int getHeightExtendBoxCount() {
+        return mHeightTopBoxCount;
+    }
 }

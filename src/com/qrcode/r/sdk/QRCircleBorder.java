@@ -8,16 +8,10 @@ public class QRCircleBorder extends QRBorder {
 
 	private int mDiameter;
 
-    public int mWidthLeftBoxCount;
-    public int mWidthRightBoxCount;
-    public int mHeightTopBoxCount;
-    public int mHeightBottomBoxCount;
-
 	public QRCircleBorder(int width, int height, int qrWidth) {
-		super(width, height);
 		mDiameter = Math.min(width, height);
 
-		int insideWidth = (int) (mDiameter * Math.sqrt(2.0) / 2) - 20;
+		int insideWidth = mDiameter * 3 / 5;
 		mBoxSize = insideWidth / qrWidth;
         int widthBoxCount = width / mBoxSize;
         int heightBoxCount = height / mBoxSize;
@@ -26,18 +20,16 @@ public class QRCircleBorder extends QRBorder {
         mHeightTopBoxCount = (heightBoxCount - 4 - qrWidth) / 2;
         mHeightBottomBoxCount = (heightBoxCount - 4 - qrWidth) / 2;
 
-        mLeftPadding = (width % mBoxSize) >> 1;
-        mTopPadding = (height % mBoxSize) >> 1;
+        //做一次矫正
+        mWidth = (widthBoxCount + 2) * mBoxSize;
+        mHeight = (heightBoxCount + 2) * mBoxSize;
 
-        mInsideRect = new Rect(mLeftPadding + (mWidthLeftBoxCount + 2) * mBoxSize
-                                , mTopPadding + (mHeightTopBoxCount + 2) * mBoxSize
-                                , mLeftPadding + (mWidthLeftBoxCount + 2 + qrWidth) * mBoxSize
-                                , mTopPadding + (mHeightTopBoxCount + 2 + qrWidth) * mBoxSize);
+        mInsideRect = new Rect((mWidthLeftBoxCount + 3) * mBoxSize
+                                , (mHeightTopBoxCount + 3) * mBoxSize
+                                , (mWidthLeftBoxCount + 3 + qrWidth) * mBoxSize
+                                , (mHeightTopBoxCount + 3 + qrWidth) * mBoxSize);
 
-		mDiameter = (mWidthLeftBoxCount * 2 + 4 + qrWidth) * mBoxSize;
-
-		mLeftPadding = (width - mDiameter) >> 1;
-		mTopPadding = (height - mDiameter) >> 1;
+		mDiameter = mWidth;
 	}
 
 	@Override

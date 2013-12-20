@@ -30,8 +30,8 @@ public class QRCodeUtils {
         options.outBackgroundColor = Color.WHITE;
         options.outForegroundColor = color;
 //        options.outGradientColor = -65528;
-//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
-//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
+//        options.outGradientType = QRCodePixelOptions.GradientType.BACKSLASH;
+//        options.outBorderType = QRCodePixelOptions.BorderType.ROUND;
         options.outShape = QRCodeOptions.Shape.ROUND;
         options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
         options.outRadiuspercent = 0.7f;
@@ -56,8 +56,8 @@ public class QRCodeUtils {
         options.outBackgroundColor = Color.WHITE;
         options.outForegroundColor = color;
 //        options.outGradientColor = -65528;
-//        options.outGradientType = QRCodeOptions.GradientType.BACKSLASH;
-//        options.outBorderType = QRCodeOptions.BorderType.ROUND;
+//        options.outGradientType = QRCodePixelOptions.GradientType.BACKSLASH;
+//        options.outBorderType = QRCodePixelOptions.BorderType.ROUND;
         options.outShape = QRCodeOptions.Shape.WATER;
         options.outErrorCorrectionLevel = ErrorCorrectionLevel.M;
         options.outRadiuspercent = 0.7f;
@@ -122,7 +122,7 @@ public class QRCodeUtils {
 
         QRCode code = null;
         try {
-            code = Encoder.encode(content, ErrorCorrectionLevel.H, null);
+            code = Encoder.encode(content, ErrorCorrectionLevel.M, null);
         } catch (WriterException e) {
             e.printStackTrace();
         }

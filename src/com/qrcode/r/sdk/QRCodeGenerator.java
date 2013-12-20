@@ -1,45 +1,32 @@
 package com.qrcode.r.sdk;
 
 import android.graphics.Bitmap;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
  * Created by michael on 13-12-19.
  */
 public class QRCodeGenerator {
 
-    public static Bitmap createQRCode(QRCodeOptions opt) {
+    public static Bitmap createQRCode(QRCodeOptionsInterface opt) {
         checkOptionArgument(opt);
 
-        if (opt.qrCodeRelaeseEffect == QRCodeOptions.QRCodeRelaeseEffect.PIXEL) {
+        if (opt.getQRCodeReleaseEffect() == QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL) {
             QREffectInterface obj = new PixelQREffect();
-            return obj.makeEffectQRCode(opt.qrContent, opt);
-        } else if (opt.qrCodeRelaeseEffect == QRCodeOptions.QRCodeRelaeseEffect.PIXEL_Border) {
+            return obj.makeEffectQRCode(opt.getContent(), opt);
+        } else if (opt.getQRCodeReleaseEffect() == QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL_Border) {
             QREffectInterface obj = new PixelBorderQREffect();
-            return obj.makeEffectQRCode(opt.qrContent, opt);
+            return obj.makeEffectQRCode(opt.getContent(), opt);
         }
 
         return null;
     }
 
-    private static void checkOptionArgument(QRCodeOptions opt) {
+    private static void checkOptionArgument(QRCodeOptionsInterface opt) {
         if (opt == null) {
             throw new IllegalArgumentException("Option can't be NULL");
         }
-        if (opt.defaultQRSize == 0) {
-            throw new IllegalArgumentException("defaultQRSize can't be 0");
-        }
-        if (opt.qrCodeRelaeseEffect == null) {
-            throw new IllegalArgumentException("qrCodeRelaeseEffect can't be NULL");
-        }
-        if (opt.qrCodeRelaeseEffect == QRCodeOptions.QRCodeRelaeseEffect.PIXEL
-            && opt.backgroundBitmap == null) {
-            throw new IllegalArgumentException("backgroundBitmap can't be empty under PIXEL effect");
-        }
 
-        if (opt.errorLevel == null) {
-            opt.errorLevel = ErrorCorrectionLevel.H;
-        }
+        opt.checkArguments();
     }
 
 }

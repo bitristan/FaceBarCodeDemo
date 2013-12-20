@@ -3,16 +3,17 @@ package com.qrcode.r.sdk;
 import android.graphics.*;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
-import com.robert.image.compose.demo.QRCodeUtils;
 
 /**
  * Created by michael on 13-12-19.
  */
-public class PixelQREffect implements QREffectInterface {
+public class PixelQREffect extends QREffectInterface {
 
     @Override
-    public Bitmap makeEffectQRCode(String content, QRCodeOptions opt) {
-        QRCode qrCode = QRCodeUtils.encodeQrcode(opt.qrContent);
+    public Bitmap makeEffectQRCode(String content, QRCodeOptionsInterface option) {
+        QRCodePixelOptions opt = (QRCodePixelOptions) option;
+
+        QRCode qrCode = encodeQrcode(opt.qrContent, opt.errorLevel);
 
         ByteMatrix input = qrCode.getMatrix();
         if (input == null) {
@@ -27,6 +28,11 @@ public class PixelQREffect implements QREffectInterface {
 
         int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
 
+        int maskImageSize = multiple * opt.maskRectCount;
+        Bitmap maskScaleBt = (maskImageSize != 0)
+                                 ? Bitmap.createScaledBitmap(opt.maskBitmap, maskImageSize, maskImageSize, false)
+                                 : null;
+
         //四周各空两个点整
         int realWidth = multiple * (inputWidth + 4);
         int realHeight = multiple * (inputHeight + 4);
@@ -40,12 +46,12 @@ public class PixelQREffect implements QREffectInterface {
         Bitmap out = Bitmap.createBitmap(realWidth, realHeight, Bitmap.Config.ARGB_8888);
         out.setHasAlpha(true);
         Canvas canvas = new Canvas(out);
-        canvas.drawARGB(200, 255, 255, 255);
+        canvas.drawARGB(255, 255, 255, 255);
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
 
-        paint.setAlpha(150);
+        paint.setAlpha(170);
         ColorMatrix allMatrix = new ColorMatrix();
         ColorMatrix colorMatrix = new ColorMatrix();
 //        //饱和度
@@ -62,6 +68,7 @@ public class PixelQREffect implements QREffectInterface {
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
+//        canvas.drawARGB(255, 255, 255, 255);
         paint.setColorFilter(null);
         paint.setAlpha(160);
 
@@ -78,6 +85,23 @@ public class PixelQREffect implements QREffectInterface {
                     canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                 }
             }
+        }
+
+        if (maskScaleBt != null) {
+            paint.setAlpha(80);
+            for (int i = 0; i < (inputWidth + 4); i += opt.maskRectCount) {
+                for (int y = 0; y < (inputWidth + 4); y += opt.maskRectCount) {
+                    canvas.drawBitmap(maskScaleBt, i * multiple, y * multiple, paint);
+                }
+            }
+        }
+
+        if (opt.frontBitmap != null) {
+            paint.setAlpha(100);
+            canvas.drawBitmap(opt.frontBitmap
+                                 , new Rect(0, 0, opt.frontBitmap.getWidth(), opt.frontBitmap.getHeight())
+                                 , new Rect(0, 0, realWidth, realHeight)
+                                 , paint);
         }
 
         return out;
