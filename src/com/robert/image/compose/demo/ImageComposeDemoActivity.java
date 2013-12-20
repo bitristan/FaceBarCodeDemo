@@ -104,6 +104,9 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
             case R.id.text_stroke:
                 startActivity(new Intent(this, TextCodeActivity.class));
                 break;
+            case R.id.face_compose:
+                startActivity(new Intent(this, FaceComposeActivity.class));
+                break;
             case R.id.pixel:
                 startActivity(new Intent(this, PixelActivity.class));
             default:
