@@ -11,6 +11,7 @@ public interface QRCodeOptionsInterface {
     public static enum QRCodePixelRelaeseEffect {
         PIXEL,
         PIXEL_Border,
+        GRADIENT,
     }
 
     void checkArguments();

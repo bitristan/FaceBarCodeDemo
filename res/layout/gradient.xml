@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+        >
+
+    <LinearLayout
+            android:id="@+id/color_layout1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            >
+
+        <View
+                android:id="@+id/c5"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#f95523"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c6"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#fb4813"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c7"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#1ca08a"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c8"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#1c51e8"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/color_layout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/color_layout1"
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true"
+            >
+
+        <View
+                android:id="@+id/c1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#f70455"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c2"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#f18307"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c3"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#27b52a"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+        <View
+                android:id="@+id/c4"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#2cbdf9"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                />
+
+    </LinearLayout>
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/color_layout2"
+            android:layout_alignParentTop="true"
+            >
+
+        <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="360dp"
+                android:layout_height="360dp"
+                android:layout_centerInParent="true"
+                android:padding="5dp"
+                >
+        </android.support.v4.view.ViewPager>
+
+        <!--<ImageView-->
+                <!--android:id="@+id/preview_iv"-->
+                <!--android:layout_width="360dp"-->
+                <!--android:layout_height="360dp"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:scaleType="centerCrop"-->
+                <!--android:background="@color/chat_text_color_c"-->
+                <!--/>-->
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -16,6 +16,9 @@ public class QRCodeGenerator {
         } else if (opt.getQRCodeReleaseEffect() == QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL_Border) {
             QREffectInterface obj = new PixelBorderQREffect();
             return obj.makeEffectQRCode(opt.getContent(), opt);
+        } else if (opt.getQRCodeReleaseEffect() == QRCodeOptionsInterface.QRCodePixelRelaeseEffect.GRADIENT) {
+            QREffectInterface obj = new GradientQREffect();
+            return obj.makeEffectQRCode(opt.getContent(), opt);
         }
 
         return null;

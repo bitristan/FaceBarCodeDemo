@@ -109,6 +109,10 @@ public class ImageComposeDemoActivity extends Activity implements View.OnClickLi
                 break;
             case R.id.pixel:
                 startActivity(new Intent(this, PixelActivity.class));
+                break;
+            case R.id.gradient:
+                startActivity(new Intent(this, GradientActivity.class));
+                break;
             default:
                 break;
         }

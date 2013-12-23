@@ -28,5 +28,6 @@
         <activity android:name=".TextCodeActivity"/>
         <activity android:name=".FaceComposeActivity"/>
         <activity android:name=".PixelActivity"/>
+        <activity android:name=".GradientActivity"/>
     </application>
 </manifest>
