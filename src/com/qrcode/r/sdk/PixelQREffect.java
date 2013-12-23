@@ -97,7 +97,7 @@ public class PixelQREffect extends QREffectInterface {
         }
 
         if (opt.frontBitmap != null) {
-            paint.setAlpha(100);
+            paint.setAlpha(85);
             canvas.drawBitmap(opt.frontBitmap
                                  , new Rect(0, 0, opt.frontBitmap.getWidth(), opt.frontBitmap.getHeight())
                                  , new Rect(0, 0, realWidth, realHeight)
