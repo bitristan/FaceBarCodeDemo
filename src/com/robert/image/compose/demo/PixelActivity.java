@@ -138,7 +138,7 @@ public class PixelActivity extends Activity {
 //                            opt.errorLevel = ErrorCorrectionLevel;
                             opt.maskBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.aaa))).getBitmap();
                             opt.maskRectCount = 3;
-                            opt.frontBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f_1))).getBitmap();
+//                            opt.frontBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f_1))).getBitmap();
                             QRCodeGenerator.createQRCode(opt);
                             mQRCodeBt = QRCodeGenerator.createQRCode(opt);
                             mOutImageView.setImageBitmap(mQRCodeBt);

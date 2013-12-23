@@ -55,10 +55,10 @@ public class PixelQREffect extends QREffectInterface {
         ColorMatrix allMatrix = new ColorMatrix();
         ColorMatrix colorMatrix = new ColorMatrix();
 //        //饱和度
-        colorMatrix.setSaturation(6);
+        colorMatrix.setSaturation(8);
         allMatrix.postConcat(colorMatrix);
         //对比度
-        float contrast = (float) ((10 + 64) / 128.0);
+        float contrast = (float) (1.3);
         ColorMatrix cMatrix = new ColorMatrix();
         cMatrix.set(new float[]{contrast, 0, 0, 0, 0, 0,
                                    contrast, 0, 0, 0,// 改变对比度
@@ -68,11 +68,21 @@ public class PixelQREffect extends QREffectInterface {
         paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
-//        canvas.drawARGB(255, 255, 255, 255);
         paint.setColorFilter(null);
+//        paint.setColor(Color.WHITE);
         paint.setAlpha(160);
 
         Rect box = new Rect();
+
+//        //因为周边有2 box的空位置，所以现将此填满
+//        //上
+//        canvas.drawRect(new Rect(0, 0, realWidth, 2 * multiple), paint);
+//        //下
+//        canvas.drawRect(new Rect(0, realHeight - 2 * multiple, realWidth, realHeight), paint);
+//        //左
+//        canvas.drawRect(new Rect(0, 0, 2 * multiple, realHeight), paint);
+//        //右
+//        canvas.drawRect(new Rect(realWidth - 2 * multiple, 0, realWidth, realHeight), paint);
 
         for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
@@ -83,6 +93,8 @@ public class PixelQREffect extends QREffectInterface {
 
                 if (input.get(inputX, inputY) == 1) {
                     canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                } else {
+//                    canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                 }
             }
         }
