@@ -69,8 +69,8 @@ public class QRCodeGradientOptions implements QRCodeOptionsInterface {
     }
 
     @Override
-    public QRCodePixelRelaeseEffect getQRCodeReleaseEffect() {
-        return QRCodePixelRelaeseEffect.GRADIENT;
+    public QRCodePixelReleaseEffect getQRCodeReleaseEffect() {
+        return QRCodePixelReleaseEffect.GRADIENT;
     }
 
     @Override

@@ -132,20 +132,20 @@ public class PixelActivity extends Activity {
 
                             QRCodePixelOptions opt = new QRCodePixelOptions();
                             opt.backgroundBitmap = org;
-                            opt.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL;
+                            opt.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelReleaseEffect.PIXEL;
                             opt.qrContent = Config.QRCODE_CONTENT;
                             opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
 //                            opt.errorLevel = ErrorCorrectionLevel;
-                            opt.maskBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.qqq))).getBitmap();
-                            opt.maskRectCount = 2;
-                            opt.frontBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f_1))).getBitmap();
+                            opt.maskBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.aaa))).getBitmap();
+                            opt.maskRectCount = 3;
+//                            opt.frontBitmap = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.pre_f_1))).getBitmap();
                             QRCodeGenerator.createQRCode(opt);
                             mQRCodeBt = QRCodeGenerator.createQRCode(opt);
                             mOutImageView.setImageBitmap(mQRCodeBt);
 
                             QRCodePixelOptions opt1 = new QRCodePixelOptions();
                             opt1.backgroundBitmap = org;
-                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL_Border;
+                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelReleaseEffect.PIXEL_Border;
                             opt1.qrContent = Config.QRCODE_CONTENT;
                             opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                             opt1.errorLevel = ErrorCorrectionLevel.M;
