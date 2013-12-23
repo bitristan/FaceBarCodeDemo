@@ -1,6 +1,7 @@
 package com.qrcode.r.sdk;
 
 import android.graphics.*;
+import android.util.Log;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
 
@@ -59,7 +60,38 @@ public class PixelBorderQREffect extends PixelQREffect {
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
         paint.setColorFilter(null);
+        paint.setAlpha(160);
+        drawQRCodeRect(canvas, input, qrBorder.getInsideArea(), qrBorder.getBoxSize(), inputWidth, inputHeight, paint);
 
+
+//        Log.d("PixelBorderQREffect", "begin");
+//        Log.d("PixelBorderQREffect", input.toString());
+//        Log.d("PixelBorderQREffect", ">>>>>>>>>>");
+        //调整input矩阵
+        //左上角
+        for (int x = 0, x1 = qrWidth - 9; x < 8; ++x, ++x1) {
+            for (int y = 0, y1 = qrHeight - 9; y < 8; ++y, ++y1) {
+                input.set(x, y, input.get(x1, y1));
+            }
+        }
+//        Log.d("PixelBorderQREffect", "完成左上角");
+//        Log.d("PixelBorderQREffect", input.toString());
+        //右上角
+        for (int x = qrWidth - 9, x1 = qrWidth - 9; x < qrWidth - 1; ++x, ++x1) {
+            for (int y = 0, y1 = qrHeight - 9; y < 8; ++y, ++y1) {
+                input.set(x, y, input.get(x1, y1));
+            }
+        }
+//        Log.d("PixelBorderQREffect", "完成右上角");
+//        Log.d("PixelBorderQREffect", input.toString());
+        //左下角
+        for (int x = 0, x1 = qrWidth - 9; x < 8; ++x, ++x1) {
+            for (int y = qrHeight - 9, y1 = qrHeight - 9; y < qrHeight - 1; ++y, ++y1) {
+                input.set(x, y, input.get(x1, y1));
+            }
+        }
+//        Log.d("PixelBorderQREffect", "完成左下角");
+//        Log.d("PixelBorderQREffect", input.toString());
 
         //为了提高效率，先将二维码绘制到一个buffer
         Rect qrRegionRect = qrBorder.getInsideArea();
@@ -70,9 +102,7 @@ public class PixelBorderQREffect extends PixelQREffect {
         //将二维码绘制到buffer
         paint.setAlpha(255);
         drawQRCodeRect(canvas1, input, new Rect(0, 0, qrRegionRect.width(), qrRegionRect.height()), qrBorder.getBoxSize(), inputWidth, inputHeight, paint);
-
         paint.setAlpha(160);
-        canvas.drawBitmap(qrCodeBuffer, qrRegionRect.left, qrRegionRect.top, paint);
 
         //左侧
         int moveLeft = (2 + inputWidth) * qrBorder.getBoxSize();
