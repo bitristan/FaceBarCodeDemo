@@ -51,7 +51,11 @@ public class PixelQREffect extends QREffectInterface {
         paint.setDither(true);
         paint.setAntiAlias(true);
 
-        paint.setAlpha(170);
+//        if (opt.maskBackground) {
+            paint.setAlpha(255);
+//        } else {
+//            paint.setAlpha(160);
+//        }
         ColorMatrix allMatrix = new ColorMatrix();
         ColorMatrix colorMatrix = new ColorMatrix();
 //        //饱和度
@@ -69,20 +73,20 @@ public class PixelQREffect extends QREffectInterface {
 
         canvas.drawBitmap(pixelBt, 0, 0, paint);
         paint.setColorFilter(null);
-//        paint.setColor(Color.WHITE);
-        paint.setAlpha(160);
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(210);
 
         Rect box = new Rect();
 
-//        //因为周边有2 box的空位置，所以现将此填满
-//        //上
-//        canvas.drawRect(new Rect(0, 0, realWidth, 2 * multiple), paint);
-//        //下
-//        canvas.drawRect(new Rect(0, realHeight - 2 * multiple, realWidth, realHeight), paint);
-//        //左
-//        canvas.drawRect(new Rect(0, 0, 2 * multiple, realHeight), paint);
-//        //右
-//        canvas.drawRect(new Rect(realWidth - 2 * multiple, 0, realWidth, realHeight), paint);
+        //因为周边有2 box的空位置，所以现将此填满
+        //上
+        canvas.drawRect(new Rect(0, 0, realWidth, 2 * multiple), paint);
+        //下
+        canvas.drawRect(new Rect(0, realHeight - 2 * multiple, realWidth, realHeight), paint);
+        //左
+        canvas.drawRect(new Rect(0, 0, 2 * multiple, realHeight), paint);
+        //右
+        canvas.drawRect(new Rect(realWidth - 2 * multiple, 0, realWidth, realHeight), paint);
 
         for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
@@ -92,15 +96,19 @@ public class PixelQREffect extends QREffectInterface {
                 box.bottom = outputY + multiple;
 
                 if (input.get(inputX, inputY) == 1) {
+                    paint.setColor(Color.BLACK);
+                    paint.setAlpha(100);
                     canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                 } else {
-//                    canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                    paint.setColor(Color.WHITE);
+                    paint.setAlpha(210);
+                    canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                 }
             }
         }
 
         if (maskScaleBt != null) {
-            paint.setAlpha(80);
+            paint.setAlpha(150);
             for (int i = 0; i < (inputWidth + 4); i += opt.maskRectCount) {
                 for (int y = 0; y < (inputWidth + 4); y += opt.maskRectCount) {
                     canvas.drawBitmap(maskScaleBt, i * multiple, y * multiple, paint);

@@ -37,6 +37,12 @@ public class QRCodePixelOptions implements QRCodeOptionsInterface {
     public String qrContent;
 
     /**
+     * true:表示漏底色，二维码区域使用地图颜色
+     * false:表示遮盖底色，二维码区域使用黑色遮盖
+     */
+//    public boolean maskBackground;
+
+    /**
      * 纠错级别
      */
     public ErrorCorrectionLevel errorLevel;

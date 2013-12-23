@@ -149,6 +149,7 @@ public class PixelActivity extends Activity {
                             opt1.qrContent = Config.QRCODE_CONTENT;
                             opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                             opt1.errorLevel = ErrorCorrectionLevel.M;
+//                            opt1.maskBackground = true;
                             QRCodeGenerator.createQRCode(opt1);
                             mQRCodeBt1 = QRCodeGenerator.createQRCode(opt1);
 //                            QRCodePixelOptions opt1 = new QRCodePixelOptions();
