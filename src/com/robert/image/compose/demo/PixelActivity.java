@@ -117,7 +117,7 @@ public class PixelActivity extends Activity {
             @Override
             public void run() {
 //                final Bitmap org = BitmapFactory.decodeFile(path);
-                final Bitmap org = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.test1))).getBitmap();
+                final Bitmap org = (Bitmap) ((BitmapDrawable) (getResources().getDrawable(R.drawable.hehua))).getBitmap();
                 if (org != null) {
                     mHandler.post(new Runnable() {
                         @Override
