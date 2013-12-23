@@ -132,7 +132,7 @@ public class PixelActivity extends Activity {
 
                             QRCodePixelOptions opt = new QRCodePixelOptions();
                             opt.backgroundBitmap = org;
-                            opt.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL;
+                            opt.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelReleaseEffect.PIXEL;
                             opt.qrContent = Config.QRCODE_CONTENT;
                             opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
 //                            opt.errorLevel = ErrorCorrectionLevel;
@@ -145,7 +145,7 @@ public class PixelActivity extends Activity {
 
                             QRCodePixelOptions opt1 = new QRCodePixelOptions();
                             opt1.backgroundBitmap = org;
-                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelRelaeseEffect.PIXEL_Border;
+                            opt1.qrCodeRelaeseEffect = QRCodeOptionsInterface.QRCodePixelReleaseEffect.PIXEL_Border;
                             opt1.qrContent = Config.QRCODE_CONTENT;
                             opt1.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                             opt1.errorLevel = ErrorCorrectionLevel.M;

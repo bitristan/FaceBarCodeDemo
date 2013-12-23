@@ -47,7 +47,7 @@ public class QRCodePixelOptions implements QRCodeOptionsInterface {
      */
     public ErrorCorrectionLevel errorLevel;
 
-    public QRCodePixelRelaeseEffect qrCodeRelaeseEffect;
+    public QRCodePixelReleaseEffect qrCodeRelaeseEffect;
 
     @Override
     public String getContent() {
@@ -55,7 +55,7 @@ public class QRCodePixelOptions implements QRCodeOptionsInterface {
     }
 
     @Override
-    public QRCodePixelRelaeseEffect getQRCodeReleaseEffect() {
+    public QRCodePixelReleaseEffect getQRCodeReleaseEffect() {
         return qrCodeRelaeseEffect;
     }
 
