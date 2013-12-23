@@ -24,6 +24,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.qrcode.r.sdk.QRCodeFaceOptions;
 import com.qrcode.sdk.QRCodeGenerator;
 import com.qrcode.sdk.QRCodeOptions;
 
@@ -147,7 +148,12 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
 
             long start = System.nanoTime();
             QRCode qrcode = encodeQrcode(null);
-            Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, point);
+            //Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, point);
+            QRCodeFaceOptions opt = new QRCodeFaceOptions();
+            opt.mQrContent = QRCODE_DEFAULT_CONTENT;
+            opt.mSize = QRCODE_DEFAULT_SIZE;
+            opt.mFaceBmp = mOriginal;
+            Bitmap composedBmp = com.qrcode.r.sdk.QRCodeGenerator.createQRCode(opt);
             mPreviewIv.setImageBitmap(composedBmp);
             long end = System.nanoTime();
             System.out.println("total time is: " + (end - start));

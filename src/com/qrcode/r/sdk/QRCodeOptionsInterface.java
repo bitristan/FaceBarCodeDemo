@@ -8,14 +8,15 @@ public interface QRCodeOptionsInterface {
     /**
      * 二维码效果
      */
-    public static enum QRCodePixelRelaeseEffect {
+    public static enum QRCodePixelReleaseEffect {
         PIXEL,
         PIXEL_Border,
+        FACE,
     }
 
     void checkArguments();
 
-    QRCodePixelRelaeseEffect getQRCodeReleaseEffect();
+    QRCodePixelReleaseEffect getQRCodeReleaseEffect();
 
     String getContent();
 
