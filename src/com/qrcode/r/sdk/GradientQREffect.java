@@ -9,7 +9,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
-import com.robert.image.compose.demo.QRCodeUtils;
 
 /**
  * Created by zhangdi on 13-12-20.
@@ -20,7 +19,7 @@ public class GradientQREffect extends QREffectInterface {
     public Bitmap makeEffectQRCode(String content, QRCodeOptionsInterface options) {
         QRCodeGradientOptions opt = (QRCodeGradientOptions) options;
 
-        QRCode qrCode = QRCodeUtils.encodeQrcode(opt.qrContent);
+        QRCode qrCode = encodeQrcode(opt.qrContent, opt.errorLevel);
 
         ByteMatrix input = qrCode.getMatrix();
         if (input == null) {
