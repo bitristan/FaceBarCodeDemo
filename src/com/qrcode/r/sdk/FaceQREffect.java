@@ -17,7 +17,7 @@ import com.google.zxing.qrcode.encoder.QRCode;
  */
 public class FaceQREffect extends QREffectInterface {
     private static final int MAX_FACES = 1;
-    private static final float CENTER_PERCENT = 0.4f;
+    private static final float CENTER_PERCENT = 0.3f;
     private static final int DEFAULT_BORDER = 2;
 
     @Override
@@ -43,7 +43,7 @@ public class FaceQREffect extends QREffectInterface {
         int faceLeftPos = (width - faceBmp.getWidth()) / 2;
         int faceTopPos = (width - faceBmp.getHeight()) / 2;
 
-        QRCode qrcode = encodeQrcode(options.getContent(), ErrorCorrectionLevel.H);
+        QRCode qrcode = encodeQrcode(options.getContent(), options.errorLevel);
         ByteMatrix input = qrcode.getMatrix();
         if (input == null) {
             throw new IllegalStateException();
@@ -68,8 +68,10 @@ public class FaceQREffect extends QREffectInterface {
         Bitmap detectFaceBmp = faceBmp.copy(Bitmap.Config.RGB_565, true);
         FaceDetector.Face faces[] = new FaceDetector.Face[1];
         FaceDetector detector = new FaceDetector(detectFaceBmp.getWidth(), detectFaceBmp.getHeight(), MAX_FACES);
+        boolean findFace = false;
         int count = detector.findFaces(detectFaceBmp, faces);
         if (count > 0) {
+            findFace = true;
             FaceDetector.Face face = faces[0];
             PointF centerPoint = new PointF();
             face.getMidPoint(centerPoint);
@@ -104,6 +106,7 @@ public class FaceQREffect extends QREffectInterface {
             faceRect.right += faceLeftPos;
             faceRect.bottom += faceTopPos;
         } else {
+            findFace = false;
             faceBmp = Bitmap.createScaledBitmap(faceBmp, maxCenterSize, maxCenterSize, false);
             faceLeftPos = (width - faceBmp.getWidth()) / 2;
             faceTopPos = (width - faceBmp.getHeight()) / 2;
@@ -112,32 +115,36 @@ public class FaceQREffect extends QREffectInterface {
         }
         detectFaceBmp.recycle();
 
-        Bitmap bottomBmp = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bottomBmp);
-        canvas.drawColor(Color.WHITE);
+        faceBmp = binarization(faceBmp, Color.WHITE, color);
+        faceBmp = brightenBitmap(faceBmp);
+
+//        Bitmap bottomBmp = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
+//        Canvas canvasBottom = new Canvas(bottomBmp);
+//        canvasBottom.drawColor(Color.WHITE);
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
 
-        faceBmp = binarization(faceBmp, Color.WHITE, color);
-        faceBmp = brightenBitmap(faceBmp);
-        System.out.println("width = " + width + "; face width = " + faceBmp.getWidth());
-        canvas.drawBitmap(faceBmp, faceLeftPos, faceTopPos, null);
+//        canvasBottom.drawBitmap(faceBmp, faceLeftPos, faceTopPos, null);
 
-        Bitmap topBmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(topBmp);
-        canvas.drawColor(Color.argb(0, 0, 0, 0));
+        Bitmap out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvasTop = new Canvas(out);
+        canvasTop.drawColor(Color.WHITE);
         paint.setColor(color);
+
+        if (findFace) {
+            canvasTop.drawBitmap(faceBmp, faceLeftPos, faceTopPos, paint);
+        }
 
         for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
                 if (input.get(inputX, inputY) == 1) {
                     if (isFinderPatterns(input, inputX, inputY)) {
-                        canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                        canvasTop.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                         continue;
                     }
 
-                    if (isInArea(outputX, outputY, faceRect)) {
+                    if (findFace && isInArea(outputX, outputY, faceRect)) {
                         boolean isAllInCenterCircle = true;
                         for (int i = 0; i < multiple; i++) {
                             for (int j = 0; j < multiple; j++) {
@@ -150,24 +157,21 @@ public class FaceQREffect extends QREffectInterface {
                         }
 
                         if (!isAllInCenterCircle) {
-                            canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                            canvasTop.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                         }
                     } else {
                         paint.setColor(color);
-                        canvas.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
+                        canvasTop.drawRect(new Rect(outputX, outputY, outputX + multiple, outputY + multiple), paint);
                     }
                 }
             }
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.WHITE);
-        paint.setColor(Color.RED);
+        if (!findFace) {
+            canvasTop.drawBitmap(faceBmp, faceLeftPos, faceTopPos, paint);
+        }
 
-        canvas.drawBitmap(bottomBmp, 0, 0, null);
-        canvas.drawBitmap(topBmp, 0, 0, null);
-        return bitmap;
+        return out;
     }
 
     private Bitmap binarization(Bitmap bitmap, int lowColor, int highColor) {

@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.FaceDetector;
 import android.net.Uri;
 import android.os.Bundle;
@@ -107,12 +108,17 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case TAKE_PICTURE:
-                    mOriginal = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/test/1000.jpg");
-                    mOriginalIv.setImageBitmap(mOriginal);
+                    try {
+//                    mOriginal = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/test/1000.jpg");
+                        mOriginal = BitmapFactory.decodeStream(getAssets().open("image/000.jpg"));
+                        mOriginalIv.setImageBitmap(mOriginal);
 
-                    QRCode qrcode = encodeQrcode(null);
-                    Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, null);
-                    mPreviewIv.setImageBitmap(composedBmp);
+                        QRCode qrcode = encodeQrcode(null);
+                        Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, null);
+                        mPreviewIv.setImageBitmap(composedBmp);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
             }
         }
@@ -143,15 +149,16 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                 options.inSampleSize = 2;
             }
             options.inJustDecodeBounds = false;
-            mOriginal = BitmapFactory.decodeStream(stream, null, options);
-            mOriginalIv.setImageBitmap(mOriginal);
+            mOriginal = (Bitmap) ((BitmapDrawable) getResources().getDrawable(R.drawable.test_123456)).getBitmap();
+//            mOriginalIv.setImageBitmap(covertBitmapWithHSB(convertGrayImg(mOriginal)));
+            mOriginalIv.setImageBitmap(covertBitmapWithHSB(mOriginal));
 
             long start = System.nanoTime();
             QRCode qrcode = encodeQrcode(null);
-            //Bitmap composedBmp = makeFaceQRCodeBt(mOriginal, point);
             QRCodeFaceOptions opt = new QRCodeFaceOptions();
-            opt.mQrContent = QRCODE_DEFAULT_CONTENT;
+            opt.mQrContent = Config.QRCODE_CONTENT;
             opt.mSize = QRCODE_DEFAULT_SIZE;
+            opt.errorLevel = ErrorCorrectionLevel.H;
             opt.mFaceBmp = mOriginal;
             Bitmap composedBmp = com.qrcode.r.sdk.QRCodeGenerator.createQRCode(opt);
             mPreviewIv.setImageBitmap(composedBmp);
@@ -160,6 +167,58 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Bitmap convertGrayImg(Bitmap bt) {
+        int w = bt.getWidth(), h = bt.getHeight();
+        int[] pix = new int[w * h];
+        bt.getPixels(pix, 0, w, 0, 0, w, h);
+
+        int alpha = 0xFF << 24;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                // 获得像素的颜色
+                int color = pix[w * i + j];
+                int red = ((color & 0x00FF0000) >> 16);
+                int green = ((color & 0x0000FF00) >> 8);
+                int blue = color & 0x000000FF;
+//                color = (red + green + blue) / 3;
+                color = (red * 77 + green * 151 + blue * 28) >> 8;
+                color = alpha | (color << 16) | (color << 8) | color;
+                pix[w * i + j] = color;
+            }
+        }
+        Bitmap result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        result.setPixels(pix, 0, w, 0, 0, w, h);
+        return result;
+    }
+
+    public Bitmap covertBitmapWithHSB(Bitmap bt) {
+        int w = bt.getWidth(), h = bt.getHeight();
+        int[] pix = new int[w * h];
+        bt.getPixels(pix, 0, w, 0, 0, w, h);
+
+        float[] hsv = new float[3];
+        int alpha = 0xFF << 24;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                int color = pix[w * i + j];
+                int red = Color.red(color);
+                int green = Color.green(color);
+                int blue = Color.blue(color);
+//                Color.colorToHSV(color, hsv);
+                Color.RGBToHSV(red, green, blue, hsv);
+                hsv[0] = 120;
+                hsv[2] = (float) 0.8;
+                color = Color.HSVToColor(hsv);
+                color = alpha | color;
+                pix[w * i + j] = color;
+            }
+        }
+
+        Bitmap result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        result.setPixels(pix, 0, w, 0, 0, w, h);
+        return result;
     }
 
     public RectF caculateFaceRect() {
@@ -567,7 +626,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                         for (int i = 0; i < multiple; i++) {
                             for (int j = 0; j < multiple; j++) {
                                 if (Math.hypot((outputX + j - (faceRect.left + faceRect.width() / 2.0f)) / (faceRect.width() / 2),
-                                        (outputY + i - (faceRect.top + faceRect.height() / 2.0f)) / (faceRect.height() / 2)) > 1) {
+                                                  (outputY + i - (faceRect.top + faceRect.height() / 2.0f)) / (faceRect.height() / 2)) > 1) {
                                     isAllInCenterCircle = false;
                                     break;
                                 }
@@ -633,10 +692,10 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
         Paint paint = new Paint();
         ColorMatrix lightenColorMatrix = new ColorMatrix();
         lightenColorMatrix.set(new float[]{
-                1, 0, 0, 0, 0.25f * 255,
-                0, 1, 0, 0, 0.25f * 255,
-                0, 0, 1, 0, 0.25f * 255,
-                0, 0, 0, 1, 0
+                                              1, 0, 0, 0, 0.25f * 255,
+                                              0, 1, 0, 0, 0.25f * 255,
+                                              0, 0, 1, 0, 0.25f * 255,
+                                              0, 0, 0, 1, 0
         });
         paint.setColorFilter(new ColorMatrixColorFilter(lightenColorMatrix));
         canvas.drawBitmap(original, 0, 0, paint);
@@ -727,7 +786,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                 for (int k = 0; k < dot; k++) {
                     for (int l = 0; l < dot; l++) {
                         int dotColor = original.getPixel(i * dot + k, j
-                                * dot + l);
+                                                                          * dot + l);
                         rr += Color.red(dotColor);
                         gg += Color.green(dotColor);
                         bb += Color.blue(dotColor);
@@ -739,7 +798,7 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
                 for (int k = 0; k < dot; k++) {
                     for (int l = 0; l < dot; l++) {
                         bitmap.setPixel(i * dot + k, j * dot + l,
-                                Color.rgb(rr, gg, bb));
+                                           Color.rgb(rr, gg, bb));
                     }
                 }
             }

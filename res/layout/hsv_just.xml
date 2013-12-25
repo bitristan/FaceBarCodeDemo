@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:paddingLeft="15dp"
+              android:paddingRight="15dp">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/hue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/image"
+        android:layout_alignLeft="@id/image"
+        android:layout_alignRight="@id/image"
+        android:layout_marginTop="15dp"
+        android:hint="色相"/>
+    <EditText
+        android:id="@+id/su"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hue"
+        android:layout_alignLeft="@id/hue"
+        android:layout_alignRight="@id/hue"
+        android:layout_marginTop="15dp"
+        android:hint="饱和度"/>
+    <EditText
+        android:id="@+id/bright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/su"
+        android:layout_alignLeft="@id/su"
+        android:layout_alignRight="@id/su"
+        android:layout_marginTop="15dp"
+        android:hint="亮度"/>
+
+    <Button
+        android:id="@+id/make"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bright"
+        android:layout_alignLeft="@id/bright"
+        android:layout_alignRight="@id/bright"
+        android:layout_marginTop="10dp"
+        android:text="生成"/>
+
+</RelativeLayout>

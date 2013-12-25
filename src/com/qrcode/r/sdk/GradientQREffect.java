@@ -110,23 +110,45 @@ public class GradientQREffect extends QREffectInterface {
             }
         }
 
-        int frontWidth = (int) (0.4 * realWidth);
-        int frontHeight = (int) (0.4 * realHeight);
+        int frontWidth = (int) (0.5 * realWidth);
+        int frontHeight = (int) (0.5 * realHeight);
 
         int binStartColor = getGradientColor(startColor, endColor, (realHeight - frontHeight) / 2.0f / realHeight);
         int binEndColor = getGradientColor(startColor, endColor, (realHeight + frontHeight) / 2.0f / realHeight);
         // 二值化
-        Bitmap front = binarization(opt.frontBitmap, bgColor, binStartColor, binEndColor);
+//        Bitmap front = binarization(opt.frontBitmap, bgColor, binStartColor, binEndColor);
+        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
+        Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), false);
+        //现将图片做一次缩放，目的是为了减小处理的像素数量
+        scaleFront = convertGrayImg(scaleFront);
+        Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
+        if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
+            opt.frontBitmap.recycle();
+            opt.frontBitmap = null;
+        }
 
-        // 边框渐变
-        Bitmap border = borderGradient(opt.borderBitmap, binStartColor, binEndColor);
+        Bitmap scaleBroder = Bitmap.createScaledBitmap(opt.borderBitmap, frontRect.width(), frontRect.height(), false);
+        if (opt.borderBitmap != null && !opt.borderBitmap.isRecycled()) {
+            opt.borderBitmap.recycle();
+            opt.borderBitmap = null;
+        }
+        Bitmap border = borderGradient(scaleBroder, binStartColor, binEndColor);
+        if (scaleBroder != null && !scaleBroder.isRecycled()) {
+            scaleBroder.recycle();
+            scaleBroder = null;
+        }
+
         // 加边框
         front = borderFront(border.getWidth(), border.getHeight(), border, front);
 
         // 遮盖切割
-        front = maskFront(opt.maskBitmap.getWidth(), opt.maskBitmap.getHeight(), opt.maskBitmap, front);
+        Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width(), frontRect.height(), false);
+        if (opt.maskBitmap != null && !opt.maskBitmap.isRecycled()) {
+            opt.maskBitmap.recycle();
+            opt.maskBitmap = null;
+        }
+        front = maskFront(scaleMask.getWidth(), scaleMask.getHeight(), scaleMask, front);
 
-        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
         Rect faceRect = new Rect(0, 0, front.getWidth(), front.getHeight());
         canvas.drawBitmap(front, faceRect, frontRect, paint);
 
@@ -143,6 +165,76 @@ public class GradientQREffect extends QREffectInterface {
         if (inputX < -3 || inputX > input.getWidth() + 2 || inputY < -3 || inputY > input.getHeight() + 2)
             return false;
         return input.get(inputX, inputY) == 1;
+    }
+
+    private Bitmap bitmapHSB(Bitmap bt, int startColor, int endColor) {
+        Bitmap out = Bitmap.createBitmap(bt.getWidth(), bt.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setColor(Color.WHITE);
+
+        float[] start = new float[3];
+        float[] end = new float[3];
+        Color.colorToHSV(startColor, start);
+        start[1] = 0;
+        start[2] = 0;
+        Color.colorToHSV(endColor, end);
+        end[1] = 0;
+        end[2] = 0;
+        bt = covertBitmapWithHSBWithHChanged(bt, start, end);
+
+        ColorMatrix allMatrix = new ColorMatrix();
+        ColorMatrix colorMatrix = new ColorMatrix();
+        setContrast(colorMatrix, 160, 120);
+        allMatrix.postConcat(colorMatrix);
+//
+        paint.setColorFilter(new ColorMatrixColorFilter(allMatrix));
+
+        canvas.drawBitmap(bt, 0, 0, paint);
+
+        return out;
+    }
+
+    private static void setContrast(ColorMatrix cm, int contrast, int illumination) {
+        //contrast 0~200
+        float c = (contrast * 1.0f - 100) / 100;
+        float matrixContrast = (float) Math.tan((45 + 44 * c) / 180 * Math.PI);
+
+        float matrixIllumination = (illumination - 100) / (1.0f * 100);
+        float translate = -127.5f * (1 - matrixIllumination) * matrixContrast + 127.5f * (1 + matrixIllumination);
+
+        cm.set(new float[]{matrixContrast, 0, 0, 0, translate,
+                              0, matrixContrast, 0, 0, translate,
+                              0, 0, matrixContrast, 0, translate,
+                              0, 0, 0, 1, 0});
+    }
+
+    private Bitmap covertBitmapWithHSBWithHChanged(Bitmap bt, float[] startHSVAdjust, float[] endHSVAdjust) {
+        int w = bt.getWidth(), h = bt.getHeight();
+        int[] pix = new int[w * h];
+        bt.getPixels(pix, 0, w, 0, 0, w, h);
+
+        float hueDeta = (endHSVAdjust[0] - startHSVAdjust[0]) / h;
+        float[] pixelHSV = new float[3];
+        int alpha = 0xFF << 24;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                int color = pix[w * i + j];
+                Color.colorToHSV(color, pixelHSV);
+
+                pixelHSV[0] = startHSVAdjust[0] + hueDeta * i;
+                pixelHSV[1]  = 1 - pixelHSV[2];
+                color = Color.HSVToColor(pixelHSV);
+                color = alpha | color;
+                pix[w * i + j] = color;
+            }
+        }
+
+        Bitmap result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        result.setPixels(pix, 0, w, 0, 0, w, h);
+        return result;
     }
 
     private int getGradientColor(int startColor, int endColor, float ratio) {
@@ -290,6 +382,35 @@ public class GradientQREffect extends QREffectInterface {
         return out;
     }
 
+    /**
+     * 灰度图转化
+     *
+     * @param bt
+     * @return
+     */
+    public Bitmap convertGrayImg(Bitmap bt) {
+        int w = bt.getWidth(), h = bt.getHeight();
+        int[] pix = new int[w * h];
+        bt.getPixels(pix, 0, w, 0, 0, w, h);
+
+        int alpha = 0xFF << 24;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                // 获得像素的颜色
+                int color = pix[w * i + j];
+                int red = ((color & 0x00FF0000) >> 16);
+                int green = ((color & 0x0000FF00) >> 8);
+                int blue = color & 0x000000FF;
+//                color = (red + green + blue) / 3;
+                color = (red * 77 + green * 151 + blue * 28) >> 8;
+                color = alpha | (color << 16) | (color << 8) | color;
+                pix[w * i + j] = color;
+            }
+        }
+        Bitmap result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        result.setPixels(pix, 0, w, 0, 0, w, h);
+        return result;
+    }
 
     /**
      * 二值化

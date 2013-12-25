@@ -2,6 +2,7 @@ package com.qrcode.r.sdk;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 /**
  * Created by robert on 13-12-23.
@@ -14,6 +15,8 @@ public class QRCodeFaceOptions implements QRCodeOptionsInterface {
 
     public String mQrContent;
     public Bitmap mFaceBmp;
+
+    public ErrorCorrectionLevel errorLevel;
 
     public int mSize;
     public int mColor;
