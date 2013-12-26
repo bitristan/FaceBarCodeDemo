@@ -117,24 +117,24 @@ public class GradientQREffect extends QREffectInterface {
         int binEndColor = getGradientColor(startColor, endColor, (realHeight + frontHeight) / 2.0f / realHeight);
         // 二值化
 //        Bitmap front = binarization(opt.frontBitmap, bgColor, binStartColor, binEndColor);
-        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
+        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2 + 4, (realHeight + frontHeight) / 2 + 4);
         Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), false);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
         scaleFront = convertGrayImg(scaleFront);
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
         if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
-            opt.frontBitmap.recycle();
+//            opt.frontBitmap.recycle();
             opt.frontBitmap = null;
         }
 
         Bitmap scaleBroder = Bitmap.createScaledBitmap(opt.borderBitmap, frontRect.width(), frontRect.height(), false);
         if (opt.borderBitmap != null && !opt.borderBitmap.isRecycled()) {
-            opt.borderBitmap.recycle();
+//            opt.borderBitmap.recycle();
             opt.borderBitmap = null;
         }
         Bitmap border = borderGradient(scaleBroder, binStartColor, binEndColor);
         if (scaleBroder != null && !scaleBroder.isRecycled()) {
-            scaleBroder.recycle();
+//            scaleBroder.recycle();
             scaleBroder = null;
         }
 
@@ -142,9 +142,9 @@ public class GradientQREffect extends QREffectInterface {
         front = borderFront(border.getWidth(), border.getHeight(), border, front);
 
         // 遮盖切割
-        Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width(), frontRect.height(), false);
+        Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width() - 4, frontRect.height() - 4, false);
         if (opt.maskBitmap != null && !opt.maskBitmap.isRecycled()) {
-            opt.maskBitmap.recycle();
+//            opt.maskBitmap.recycle();
             opt.maskBitmap = null;
         }
         front = maskFront(scaleMask.getWidth(), scaleMask.getHeight(), scaleMask, front);
@@ -348,9 +348,11 @@ public class GradientQREffect extends QREffectInterface {
         paint.setAntiAlias(true);
 
         Rect src = new Rect(0, 0, front.getWidth(), front.getHeight());
-        Rect dst = new Rect(0, 0, width, height);
+        Rect dst = new Rect((width - front.getWidth())/2, (height - front.getHeight())/2
+                               , (width + front.getWidth())/2, (height + front.getHeight())/2);
         canvas.drawBitmap(front, src, dst, paint);
 
+        dst = new Rect(0, 0, width, height);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
         src.set(0, 0, mask.getWidth(), mask.getHeight());
         canvas.drawBitmap(mask, src, dst, paint);

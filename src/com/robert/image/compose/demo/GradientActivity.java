@@ -187,23 +187,28 @@ public class GradientActivity extends Activity implements View.OnClickListener {
                         opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                         opt.startColor = mStartColor;
                         opt.endColor = mEndColor;
+                        Bitmap frontBt = ((BitmapDrawable) getResources().getDrawable(R.drawable.test_hsv)).getBitmap();
                         try {
                             if (position == 0) {
                                 opt.maskBitmap = BitmapFactory.decodeStream(getAssets().open("image/a1.png"));
                                 opt.borderBitmap = BitmapFactory.decodeStream(getAssets().open("image/b1.png"));
-                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/000.jpg"));
+//                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/000.jpg"));
+                                opt.frontBitmap = frontBt;
                             } else if (position == 1) {
                                 opt.maskBitmap = BitmapFactory.decodeStream(getAssets().open("image/a2.png"));
                                 opt.borderBitmap = BitmapFactory.decodeStream(getAssets().open("image/b2.png"));
-                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/001.jpg"));
+//                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/001.jpg"));
+                                opt.frontBitmap = frontBt;
                             } else if (position == 2) {
                                 opt.maskBitmap = BitmapFactory.decodeStream(getAssets().open("image/a3.png"));
                                 opt.borderBitmap = BitmapFactory.decodeStream(getAssets().open("image/b3.png"));
-                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/002.jpg"));
+//                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/002.jpg"));
+                                opt.frontBitmap = frontBt;
                             } else if (position == 3) {
                                 opt.maskBitmap = BitmapFactory.decodeStream(getAssets().open("image/a4.png"));
                                 opt.borderBitmap = BitmapFactory.decodeStream(getAssets().open("image/b4.png"));
-                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/003.jpg"));
+//                                opt.frontBitmap = BitmapFactory.decodeStream(getAssets().open("image/003.jpg"));
+                                opt.frontBitmap = frontBt;
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
