@@ -19,7 +19,7 @@ public class QRCodeFaceOptions implements QRCodeOptionsInterface {
     public ErrorCorrectionLevel errorLevel;
 
     public int mSize;
-    public int mColor;
+    public int mColor = Color.parseColor("#dd349d");
 
     @Override
     public void checkArguments() {
@@ -35,9 +35,9 @@ public class QRCodeFaceOptions implements QRCodeOptionsInterface {
             mSize = DEFAULT_SIZE;
         }
 
-        if (mColor <= 0) {
-            mColor = PREDEFINED_COLOR[(int) (Math.random() * 4)];
-        }
+//        if (mColor <= 0) {
+//            mColor = PREDEFINED_COLOR[(int) (Math.random() * 4)];
+//        }
     }
 
     @Override
