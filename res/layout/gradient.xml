@@ -19,7 +19,7 @@
                 android:id="@+id/c5"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="#f95523"
+                android:background="#f85327"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 />
@@ -66,7 +66,7 @@
                 android:id="@+id/c1"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="#f70455"
+                android:background="#f70054"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 />

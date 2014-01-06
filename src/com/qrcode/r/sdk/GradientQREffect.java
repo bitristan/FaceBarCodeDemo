@@ -44,6 +44,7 @@ public class GradientQREffect extends QREffectInterface {
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
 
         // 渐变开始结束颜色
         int startColor = opt.startColor;
@@ -58,8 +59,9 @@ public class GradientQREffect extends QREffectInterface {
             for (int inputX = -3, outputX = 0; inputX < inputWidth + 3; inputX++, outputX += multiple) {
                 box.set(outputX, outputY, outputX + multiple, outputY + multiple);
 
-                float ratio = (float) (inputY + 3) / qrHeight;
-                paint.setColor(getGradientColor(startColor, endColor, ratio));
+//                float ratio = (float) (inputY + 3) / qrHeight;
+//                paint.setColor(getGradientColor(startColor, endColor, ratio));
+                paint.setColor(getGradientColorByCurve(startColor, endColor, 0, qrHeight, inputY + 3));
 
                 // 边框和padding不做液化
                 if (inputX < 0 || inputX > inputWidth - 1 || inputY < 0 || inputY > inputWidth - 1) {
@@ -113,12 +115,12 @@ public class GradientQREffect extends QREffectInterface {
         int frontWidth = (int) (0.5 * realWidth);
         int frontHeight = (int) (0.5 * realHeight);
 
-        int binStartColor = getGradientColor(startColor, endColor, (realHeight - frontHeight) / 2.0f / realHeight);
-        int binEndColor = getGradientColor(startColor, endColor, (realHeight + frontHeight) / 2.0f / realHeight);
+        int binStartColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight - frontHeight) / 2.0f);
+        int binEndColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight + frontHeight) / 2.0f);
         // 二值化
 //        Bitmap front = binarization(opt.frontBitmap, bgColor, binStartColor, binEndColor);
-        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2 + 4, (realHeight + frontHeight) / 2 + 4);
-        Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), false);
+        Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
+        Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), true);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
         scaleFront = convertGrayImg(scaleFront);
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
@@ -127,7 +129,7 @@ public class GradientQREffect extends QREffectInterface {
             opt.frontBitmap = null;
         }
 
-        Bitmap scaleBroder = Bitmap.createScaledBitmap(opt.borderBitmap, frontRect.width(), frontRect.height(), false);
+        Bitmap scaleBroder = Bitmap.createScaledBitmap(opt.borderBitmap, frontRect.width(), frontRect.height(), true);
         if (opt.borderBitmap != null && !opt.borderBitmap.isRecycled()) {
 //            opt.borderBitmap.recycle();
             opt.borderBitmap = null;
@@ -142,7 +144,7 @@ public class GradientQREffect extends QREffectInterface {
         front = borderFront(border.getWidth(), border.getHeight(), border, front);
 
         // 遮盖切割
-        Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width() - 4, frontRect.height() - 4, false);
+        Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width() + 12, frontRect.height() + 12, false);
         if (opt.maskBitmap != null && !opt.maskBitmap.isRecycled()) {
 //            opt.maskBitmap.recycle();
             opt.maskBitmap = null;
@@ -206,9 +208,9 @@ public class GradientQREffect extends QREffectInterface {
         float translate = -127.5f * (1 - matrixIllumination) * matrixContrast + 127.5f * (1 + matrixIllumination);
 
         cm.set(new float[]{matrixContrast, 0, 0, 0, translate,
-                              0, matrixContrast, 0, 0, translate,
-                              0, 0, matrixContrast, 0, translate,
-                              0, 0, 0, 1, 0});
+                0, matrixContrast, 0, 0, translate,
+                0, 0, matrixContrast, 0, translate,
+                0, 0, 0, 1, 0});
     }
 
     private Bitmap covertBitmapWithHSBWithHChanged(Bitmap bt, float[] startHSVAdjust, float[] endHSVAdjust) {
@@ -225,7 +227,7 @@ public class GradientQREffect extends QREffectInterface {
                 Color.colorToHSV(color, pixelHSV);
 
                 pixelHSV[0] = startHSVAdjust[0] + hueDeta * i;
-                pixelHSV[1]  = 1 - pixelHSV[2];
+                pixelHSV[1] = 1 - pixelHSV[2];
                 color = Color.HSVToColor(pixelHSV);
                 color = alpha | color;
                 pix[w * i + j] = color;
@@ -237,6 +239,14 @@ public class GradientQREffect extends QREffectInterface {
         return result;
     }
 
+    /**
+     * 平滑获取渐变色
+     *
+     * @param startColor
+     * @param endColor
+     * @param ratio
+     * @return
+     */
     private int getGradientColor(int startColor, int endColor, float ratio) {
         if (ratio <= 0.000001) {
             return startColor;
@@ -261,6 +271,57 @@ public class GradientQREffect extends QREffectInterface {
         int b3 = (int) (b1 + (b2 - b1) * ratio);
 
         return Color.argb(a3, r3, g3, b3);
+    }
+
+    /**
+     * 二次曲线获取渐变色
+     *
+     * @param startColor
+     * @param endColor
+     * @param start
+     * @param end
+     * @param offset     相对于start的偏移
+     * @return
+     */
+    private int getGradientColorByCurve(int startColor, int endColor, float start, float end, float offset) {
+        if (offset <= 0) return startColor;
+        if (offset >= end - start) return endColor;
+
+        float x = start + offset;
+        float x3 = (start + end) / 2.0f;
+        float y3;
+
+        int a1 = Color.alpha(startColor);
+        int a2 = Color.alpha(endColor);
+        y3 = a1 + (a2 - a1) / 4.0f;
+        int a3 = (int) getParabolaY(a1, a2, y3, start, end, x3, x);
+
+        int r1 = Color.red(startColor);
+        int r2 = Color.red(endColor);
+        y3 = r1 + (r2 - r1) / 4.0f;
+        int r3 = (int) getParabolaY(r1, r2, y3, start, end, x3, x);
+
+        int g1 = Color.green(startColor);
+        int g2 = Color.green(endColor);
+        y3 = g1 + (g2 - g1) / 4.0f;
+        int g3 = (int) getParabolaY(g1, g2, y3, start, end, x3, x);
+
+        int b1 = Color.blue(startColor);
+        int b2 = Color.blue(endColor);
+        y3 = b1 + (b2 - b1) / 4.0f;
+        int b3 = (int) getParabolaY(b1, b2, y3, start, end, x3, x);
+
+        return Color.argb(a3, r3, g3, b3);
+    }
+
+    private float getParabolaY(float y1, float y2, float y3, float x1, float x2, float x3, float x) {
+        float p = y1 / ((x1 - x2) * (x1 - x3));
+        float q = y2 / ((x2 - x1) * (x2 - x3));
+        float r = y3 / ((x3 - x1) * (x3 - x2));
+        float a = p + q + r;
+        float b = -p * (x2 + x3) - q * (x1 + x3) - r * (x1 + x2);
+        float c = p * x2 * x3 + q * x1 * x3 + r * x1 * x2;
+        return a * x * x + b * x + c;
     }
 
     private void drawRoundRect(Canvas canvas, RectF rect, Paint paint,
@@ -348,8 +409,8 @@ public class GradientQREffect extends QREffectInterface {
         paint.setAntiAlias(true);
 
         Rect src = new Rect(0, 0, front.getWidth(), front.getHeight());
-        Rect dst = new Rect((width - front.getWidth())/2, (height - front.getHeight())/2
-                               , (width + front.getWidth())/2, (height + front.getHeight())/2);
+        Rect dst = new Rect((width - front.getWidth()) / 2, (height - front.getHeight()) / 2
+                , (width + front.getWidth()) / 2, (height + front.getHeight()) / 2);
         canvas.drawBitmap(front, src, dst, paint);
 
         dst = new Rect(0, 0, width, height);
@@ -371,11 +432,15 @@ public class GradientQREffect extends QREffectInterface {
         int offset;
         int gradientColor;
         for (int y = 0; y < height; y++) {
-            gradientColor = getGradientColor(startColor, endColor, y / (float) height);
             for (int x = 0; x < width; x++) {
                 offset = width * y + x;
-                int a = pixels[offset] >>> 24;
-                if (pixels[offset] == Color.BLACK) {
+//                int a = pixels[offset] >>> 24;
+                if (pixels[offset] == Color.WHITE
+                        || ((pixels[offset] & 0xff000000) == 0)) {
+                    out.setPixel(x, y, pixels[offset]);
+                } else {
+                    gradientColor = getGradientColorByCurve(startColor, endColor, 0, height, y);
+                    gradientColor = (gradientColor & 0x00ffffff) | (pixels[offset] & 0xff000000);
                     out.setPixel(x, y, gradientColor);
                 }
             }
@@ -434,7 +499,8 @@ public class GradientQREffect extends QREffectInterface {
             BitMatrix matrix = binarizer.getBlackMatrix();
             int highColor;
             for (int i = 0; i < height; i++) {
-                highColor = getGradientColor(highStartColor, highEndColor, i / (float) height);
+//                highColor = getGradientColor(highStartColor, highEndColor, i / (float) height);
+                highColor = getGradientColorByCurve(highStartColor, highEndColor, 0, height, i);
                 for (int j = 0; j < width; j++) {
                     if (matrix.get(j, i)) {
                         result.setPixel(j, i, highColor);
