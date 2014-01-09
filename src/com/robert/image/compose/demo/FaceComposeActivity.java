@@ -109,7 +109,6 @@ public class FaceComposeActivity extends Activity implements View.OnClickListene
             switch (requestCode) {
                 case TAKE_PICTURE:
                     try {
-//                    mOriginal = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/test/1000.jpg");
                         mOriginal = BitmapFactory.decodeStream(getAssets().open("image/000.jpg"));
                         mOriginalIv.setImageBitmap(mOriginal);
 

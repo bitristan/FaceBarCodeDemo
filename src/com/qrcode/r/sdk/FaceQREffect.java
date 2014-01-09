@@ -11,6 +11,9 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.imagefilter.IImageFilter;
+import com.imagefilter.Image;
+import com.imagefilter.effect.*;
 
 /**
  * Created by robert on 13-12-23.
@@ -71,6 +74,7 @@ public class FaceQREffect extends QREffectInterface {
         boolean findFace = false;
         int count = detector.findFaces(detectFaceBmp, faces);
         if (count > 0) {
+            //识别出人脸
             findFace = true;
             FaceDetector.Face face = faces[0];
             PointF centerPoint = new PointF();
@@ -87,25 +91,34 @@ public class FaceQREffect extends QREffectInterface {
             }
 
             if (faceRect.width() > maxCenterSize) {
-                faceScaleCoefficient = (float) maxCenterSize / faceRect.width();
-                faceBmp = Bitmap.createScaledBitmap(faceBmp, (int) (faceBmp.getWidth() * faceScaleCoefficient), (int) (faceBmp.getHeight() * faceScaleCoefficient), false);
-                int faceRectWidth = (int) (faceRect.width() * faceScaleCoefficient);
-                int faceRectHeight = (int) (faceRect.height() * faceScaleCoefficient);
-
-                faceRect.left = (int) (faceRect.left * faceScaleCoefficient);
-                faceRect.top = (int) (faceRect.top * faceScaleCoefficient);
-                faceRect.right = faceRect.left + faceRectWidth;
-                faceRect.bottom = faceRect.top + faceRectHeight;
-
-                faceLeftPos = (width - faceBmp.getWidth()) / 2;
-                faceTopPos = (height - faceBmp.getHeight()) / 2;
+//                faceScaleCoefficient = (float) maxCenterSize / faceRect.width();
+//                faceBmp = Bitmap.createScaledBitmap(faceBmp, (int) (faceBmp.getWidth() * faceScaleCoefficient), (int) (faceBmp.getHeight() * faceScaleCoefficient), false);
+//                int faceRectWidth = (int) (faceRect.width() * faceScaleCoefficient);
+//                int faceRectHeight = (int) (faceRect.height() * faceScaleCoefficient);
+//
+//                faceRect.left = (int) (faceRect.left * faceScaleCoefficient);
+//                faceRect.top = (int) (faceRect.top * faceScaleCoefficient);
+//                faceRect.right = faceRect.left + faceRectWidth;
+//                faceRect.bottom = faceRect.top + faceRectHeight;
+//
+//                faceLeftPos = (width - faceBmp.getWidth()) / 2;
+//                faceTopPos = (height - faceBmp.getHeight()) / 2;
+                int detaX = (faceRect.width() - maxCenterSize) / 2;
+                faceRect.left = faceRect.left + detaX;
+                faceRect.right = faceRect.right - detaX;
             }
-
-            faceRect.left += faceLeftPos;
-            faceRect.top += faceTopPos;
-            faceRect.right += faceLeftPos;
-            faceRect.bottom += faceTopPos;
+            if (faceRect.height() > maxCenterSize) {
+                int deatH = (faceRect.height() - maxCenterSize) / 2;
+                faceRect.top = faceRect.top + deatH;
+                faceRect.bottom = faceRect.bottom - deatH;
+            }
+//
+//            faceRect.left += faceLeftPos;
+//            faceRect.top += faceTopPos;
+//            faceRect.right += faceLeftPos;
+//            faceRect.bottom += faceTopPos;
         } else {
+            //没有识别出人脸
             findFace = false;
             faceBmp = Bitmap.createScaledBitmap(faceBmp, maxCenterSize, maxCenterSize, false);
             faceLeftPos = (width - faceBmp.getWidth()) / 2;
@@ -115,26 +128,26 @@ public class FaceQREffect extends QREffectInterface {
         }
         detectFaceBmp.recycle();
 
-        faceBmp = binarization(faceBmp, Color.WHITE, color);
-        faceBmp = brightenBitmap(faceBmp);
+        faceBmp = makeFilter(faceBmp, new ConvolutionFilter());
+        if (findFace ) {
+            faceBmp = makeFilter(faceBmp, new AutoLevelFilter());
+        }
+        faceBmp = makeFilter(faceBmp, new BigBrotherCustomFilter(Color.blue(color), Color.green(color), Color.red(color)));
 
-//        Bitmap bottomBmp = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888);
-//        Canvas canvasBottom = new Canvas(bottomBmp);
-//        canvasBottom.drawColor(Color.WHITE);
         Paint paint = new Paint();
         paint.setDither(true);
         paint.setAntiAlias(true);
-
-//        canvasBottom.drawBitmap(faceBmp, faceLeftPos, faceTopPos, null);
 
         Bitmap out = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvasTop = new Canvas(out);
         canvasTop.drawColor(Color.WHITE);
         paint.setColor(color);
+        paint.setAlpha(200);
 
         if (findFace) {
             canvasTop.drawBitmap(faceBmp, faceLeftPos, faceTopPos, paint);
         }
+        paint.setAlpha(0xff);
 
         for (int inputY = 0, outputY = topPadding; inputY < inputHeight; inputY++, outputY += multiple) {
             for (int inputX = 0, outputX = leftPadding; inputX < inputWidth; inputX++, outputX += multiple) {
@@ -172,6 +185,40 @@ public class FaceQREffect extends QREffectInterface {
         }
 
         return out;
+    }
+
+    private Bitmap brightBitmap1(Bitmap bt) {
+        Bitmap out = Bitmap.createBitmap(bt.getWidth(), bt.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setColor(Color.WHITE);
+
+        ColorMatrix allMatrix = new ColorMatrix();
+        ColorMatrix colorMatrix = new ColorMatrix();
+        setContrast(colorMatrix, 160, 120);
+        allMatrix.postConcat(colorMatrix);
+//
+        paint.setColorFilter(new ColorMatrixColorFilter(allMatrix));
+
+        canvas.drawBitmap(bt, 0, 0, paint);
+
+        return out;
+    }
+
+    private static void setContrast(ColorMatrix cm, int contrast, int illumination) {
+        //contrast 0~200
+        float c = (contrast * 1.0f - 100) / 100;
+        float matrixContrast = (float) Math.tan((45 + 44 * c) / 180 * Math.PI);
+
+        float matrixIllumination = (illumination - 100) / (1.0f * 100);
+        float translate = -127.5f * (1 - matrixIllumination) * matrixContrast + 127.5f * (1 + matrixIllumination);
+
+        cm.set(new float[]{matrixContrast, 0, 0, 0, translate,
+                              0, matrixContrast, 0, 0, translate,
+                              0, 0, matrixContrast, 0, translate,
+                              0, 0, 0, 1, 0});
     }
 
     private Bitmap binarization(Bitmap bitmap, int lowColor, int highColor) {
@@ -219,6 +266,21 @@ public class FaceQREffect extends QREffectInterface {
         paint.setColorFilter(new ColorMatrixColorFilter(lightenColorMatrix));
         canvas.drawBitmap(original, 0, 0, paint);
         return result;
+    }
+
+    public Bitmap makeFilter(Bitmap bt, IImageFilter filter) {
+        try {
+            Image img = new Image(bt);
+            if (filter != null) {
+                img = filter.process(img);
+                img.copyPixelsFromBuffer();
+            }
+            return img.getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public Bitmap scaleFaceBitmap(Bitmap faceBmp, int size, float faceScaleCoefficient, RectF faceRect) {
