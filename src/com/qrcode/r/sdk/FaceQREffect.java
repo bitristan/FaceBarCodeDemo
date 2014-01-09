@@ -33,6 +33,11 @@ public class FaceQREffect extends QREffectInterface {
         Bitmap faceBmp = options.mFaceBmp;
         int border = DEFAULT_BORDER;
 
+        //如果图片小余二维码输出的大小,将图片处理成一样的大小
+        if (faceBmp.getWidth() < width) {
+            faceBmp = Bitmap.createScaledBitmap(faceBmp, width, height, true);
+        }
+
         if (faceBmp.getWidth() > faceBmp.getHeight()) {
             if (faceBmp.getWidth() > width) {
                 faceBmp = Bitmap.createScaledBitmap(faceBmp, width, width * faceBmp.getHeight() / faceBmp.getWidth(), false);

@@ -9,6 +9,9 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
+import com.imagefilter.IImageFilter;
+import com.imagefilter.Image;
+import com.imagefilter.effect.ConvolutionFilter;
 
 /**
  * Created by zhangdi on 13-12-20.
@@ -112,8 +115,8 @@ public class GradientQREffect extends QREffectInterface {
             }
         }
 
-        int frontWidth = (int) (0.5 * realWidth);
-        int frontHeight = (int) (0.5 * realHeight);
+        int frontWidth = (int) (0.4 * realWidth);
+        int frontHeight = (int) (0.4 * realHeight);
 
         int binStartColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight - frontHeight) / 2.0f);
         int binEndColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight + frontHeight) / 2.0f);
@@ -123,6 +126,7 @@ public class GradientQREffect extends QREffectInterface {
         Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), true);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
         scaleFront = convertGrayImg(scaleFront);
+        scaleFront = makeFilter(scaleFront, new ConvolutionFilter());
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
         if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
 //            opt.frontBitmap.recycle();
@@ -131,12 +135,10 @@ public class GradientQREffect extends QREffectInterface {
 
         Bitmap scaleBroder = Bitmap.createScaledBitmap(opt.borderBitmap, frontRect.width(), frontRect.height(), true);
         if (opt.borderBitmap != null && !opt.borderBitmap.isRecycled()) {
-//            opt.borderBitmap.recycle();
             opt.borderBitmap = null;
         }
         Bitmap border = borderGradient(scaleBroder, binStartColor, binEndColor);
         if (scaleBroder != null && !scaleBroder.isRecycled()) {
-//            scaleBroder.recycle();
             scaleBroder = null;
         }
 
@@ -146,7 +148,6 @@ public class GradientQREffect extends QREffectInterface {
         // 遮盖切割
         Bitmap scaleMask = Bitmap.createScaledBitmap(opt.maskBitmap, frontRect.width() + 12, frontRect.height() + 12, false);
         if (opt.maskBitmap != null && !opt.maskBitmap.isRecycled()) {
-//            opt.maskBitmap.recycle();
             opt.maskBitmap = null;
         }
         front = maskFront(scaleMask.getWidth(), scaleMask.getHeight(), scaleMask, front);
@@ -197,6 +198,21 @@ public class GradientQREffect extends QREffectInterface {
         canvas.drawBitmap(bt, 0, 0, paint);
 
         return out;
+    }
+
+    private Bitmap makeFilter(Bitmap bt, IImageFilter filter) {
+        try {
+            Image img = new Image(bt);
+            if (filter != null) {
+                img = filter.process(img);
+                img.copyPixelsFromBuffer();
+            }
+            return img.getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private static void setContrast(ColorMatrix cm, int contrast, int illumination) {
