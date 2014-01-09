@@ -126,7 +126,6 @@ public class GradientQREffect extends QREffectInterface {
         Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), true);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
         scaleFront = convertGrayImg(scaleFront);
-        scaleFront = makeFilter(scaleFront, new ConvolutionFilter());
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
         if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
 //            opt.frontBitmap.recycle();
