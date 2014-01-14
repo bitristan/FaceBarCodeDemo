@@ -13,21 +13,14 @@
     <application
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher">
-        <!--<activity android:name=".HSVActivity"-->
-        <!--android:label="HSV">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN"/>-->
-        <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-        <!--</intent-filter>-->
-        <!--</activity>-->
 
         <activity
-            android:name=".FaceCompose1Activity"
+            android:name="com.com.robert.image.demonew.FaceCompose1Activity"
             android:label="脸码">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
         </activity>
 
         <activity
@@ -38,10 +31,10 @@
         <activity
             android:name="ImageComposeDemoActivity"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN"/>-->
+                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".FontActivity"
@@ -49,6 +42,13 @@
         </activity>
         <activity android:name=".TextCodeActivity"/>
         <activity android:name=".PixelActivity"/>
-        <activity android:name=".GradientActivity"/>
+        <activity android:name="com.com.robert.image.demonew.GradientActivity"/>
+        <activity android:name="com.com.robert.image.demonew.BaseActivity"/>
+        <activity android:name="com.com.robert.image.demonew.QRCodeMainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

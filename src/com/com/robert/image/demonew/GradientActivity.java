@@ -1,28 +1,22 @@
-package com.robert.image.compose.demo;
+package com.com.robert.image.demonew;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 import com.qrcode.r.sdk.QRCodeGenerator;
 import com.qrcode.r.sdk.QRCodeGradientOptions;
-import com.qrcode.r.sdk.QRCodeOptionsInterface;
-import com.qrcode.r.sdk.QRCodePixelOptions;
+import com.robert.image.compose.demo.R;
 
 import java.io.IOException;
 import java.lang.ref.SoftReference;
@@ -30,7 +24,7 @@ import java.lang.ref.SoftReference;
 /**
  * Created by zhangdi on 13-12-20.
  */
-public class GradientActivity extends Activity implements View.OnClickListener {
+public class GradientActivity extends BaseActivity implements View.OnClickListener {
 
     private ViewPager mViewPager;
     private QRPagerAdapter mPageAdapter;
@@ -45,11 +39,19 @@ public class GradientActivity extends Activity implements View.OnClickListener {
 
     private Handler mHandler = new Handler();
 
+    private String mQRContent;
+
+    private int mResID;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gradient);
 
-//        mPreviewIv = (ImageView) findViewById(R.id.preview_iv);
+        enableHomeButton("渐变");
+
+        mQRContent = getIntent().getStringExtra(Config.KEY_QRCODE_CONTENT);
+        mResID = getIntent().getIntExtra(Config.KEY_RES_ID, 0);
+
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mPageAdapter = new QRPagerAdapter(this);
         mViewPager.setAdapter(mPageAdapter);
@@ -73,8 +75,6 @@ public class GradientActivity extends Activity implements View.OnClickListener {
 
         mStartColor = ((ColorDrawable) mV1.getBackground()).getColor();
         mEndColor = ((ColorDrawable) mV5.getBackground()).getColor();
-
-//        generateQRCode();
     }
 
     @Override
@@ -183,11 +183,11 @@ public class GradientActivity extends Activity implements View.OnClickListener {
                     @Override
                     public void run() {
                         QRCodeGradientOptions opt = new QRCodeGradientOptions();
-                        opt.qrContent = Config.QRCODE_CONTENT;
+                        opt.qrContent = mQRContent;
                         opt.defaultQRSize = Config.QRCODE_DEFAULT_SIZE;
                         opt.startColor = mStartColor;
                         opt.endColor = mEndColor;
-                        Bitmap frontBt = ((BitmapDrawable) getResources().getDrawable(R.drawable.test_hsv)).getBitmap();
+                        Bitmap frontBt = ((BitmapDrawable) getResources().getDrawable(mResID)).getBitmap();
                         try {
                             if (position == 0) {
                                 opt.maskBitmap = BitmapFactory.decodeStream(getAssets().open("image/a1.png"));

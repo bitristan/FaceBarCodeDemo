@@ -1,9 +1,7 @@
-package com.robert.image.compose.demo;
+package com.com.robert.image.demonew;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -22,6 +20,7 @@ import com.imagefilter.IImageFilter;
 import com.imagefilter.Image;
 import com.imagefilter.effect.*;
 import com.qrcode.r.sdk.QRCodeFaceOptions;
+import com.robert.image.compose.demo.R;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -30,7 +29,7 @@ import java.util.List;
 /**
  * Created by michael on 14-1-8.
  */
-public class FaceCompose1Activity extends Activity {
+public class FaceCompose1Activity extends BaseActivity {
 
     private ViewPager mViewPager;
 
@@ -40,9 +39,18 @@ public class FaceCompose1Activity extends Activity {
 
     private Handler mHandler = new Handler(Looper.myLooper());
 
+    private String mQRContent;
+
+    private int mRestID;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.face_compose1);
+
+        mQRContent = getIntent().getStringExtra(Config.KEY_QRCODE_CONTENT);
+        mRestID = getIntent().getIntExtra(Config.KEY_RES_ID, 0);
+
+        enableHomeButton("脸码");
 
         initUI();
     }
@@ -56,20 +64,7 @@ public class FaceCompose1Activity extends Activity {
         mViewPager.setAdapter(new FacePageAdapter(getApplicationContext()));
 
         try {
-//            mOriginBt = BitmapFactory.decodeStream(getAssets().open("image/005.jpg"));
-            mOriginBt = ((BitmapDrawable) getResources().getDrawable(R.drawable.hehua)).getBitmap();
-
-//            float[] start = new float[3];
-//            float[] end = new float[3];
-//            Color.colorToHSV(Color.rgb(214, 1, 143), start);
-//            start[1] = 0;
-//            start[2] = 0;
-//            Color.colorToHSV(Color.rgb(214, 1, 143), end);
-//            end[1] = 0;
-//            end[2] = 0;
-
-//            mOriginBt = covertBitmapWithHSBWithHChanged(mOriginBt, start, end);
-
+            mOriginBt = ((BitmapDrawable) getResources().getDrawable(mRestID)).getBitmap();
             mOriginImage.setImageBitmap(mOriginBt);
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,12 +165,23 @@ public class FaceCompose1Activity extends Activity {
 
         @Override
         public int getCount() {
-            return mFilterList.size() + 4;
+            return 4;
         }
 
         @Override
         public String getPageTitle(int position) {
-            return mFilterList.get(position).getClass().getSimpleName();
+            switch (position) {
+                case 0:
+                    return "樱花";
+                case 1:
+                    return "雾霾";
+                case 2:
+                    return "天空";
+                case 3:
+                    return "森林";
+            }
+
+            return "未知";
         }
 
         @Override
@@ -197,7 +203,7 @@ public class FaceCompose1Activity extends Activity {
                     @Override
                     public void run() {
                         QRCodeFaceOptions opt = new QRCodeFaceOptions();
-                        opt.mQrContent = Config.QRCODE_CONTENT;
+                        opt.mQrContent = mQRContent;
                         opt.mSize = 500;
                         opt.errorLevel = ErrorCorrectionLevel.H;
                         opt.mFaceBmp = mOriginBt;

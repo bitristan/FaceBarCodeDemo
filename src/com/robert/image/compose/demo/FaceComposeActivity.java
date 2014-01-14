@@ -6,18 +6,13 @@ import android.content.Intent;
 import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.FaceDetector;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import com.com.robert.image.demonew.Config;
 import com.google.zxing.*;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
@@ -26,8 +21,6 @@ import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.qrcode.r.sdk.QRCodeFaceOptions;
-import com.qrcode.sdk.QRCodeGenerator;
-import com.qrcode.sdk.QRCodeOptions;
 
 import java.io.*;
 
