@@ -12,6 +12,8 @@
     <color name="gray7">#DEDEDE</color>
     <color name="gray8">#c3c3c1</color>
 
+    <drawable name="white_trans">#6fFFFFFF</drawable>
+
     <!-- 默认的EditText中光标的提示颜色 -->
     <drawable name="edit_highlight">#8622ab</drawable>
     

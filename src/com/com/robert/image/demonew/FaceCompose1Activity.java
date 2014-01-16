@@ -106,7 +106,7 @@ public class FaceCompose1Activity extends BaseActivity {
         ret.add(new BilinearDistort());
         ret.add(new BlackWhiteFilter());
         ret.add(new BrickFilter());
-        ret.add(new BrightContrastFilter());
+        ret.add(new BrightContrastFilter(0.15f, 0.0f));
         ret.add(new BulgeFilter(-97));
         ret.add(new CleanGlassFilter());
         ret.add(new ColorQuantizeFilter());

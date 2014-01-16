@@ -27,13 +27,18 @@ public class BrightContrastFilter implements IImageFilter {
     /// The brightness factor.
     /// Should be in the range [-1, 1].
     /// </summary>
-    public float BrightnessFactor = 0.25f;
+    public float BrightnessFactor = 0.15f;
 
     /// <summary>
     /// The contrast factor.
     /// Should be in the range [-1, 1].
     /// </summary>
-    public float ContrastFactor = 0f;
+    public float ContrastFactor = 0.0f;
+
+    public BrightContrastFilter(float brightFactor, float contrastFactor) {
+        BrightnessFactor = brightFactor;
+        ContrastFactor = contrastFactor;
+    }
 
     //@Override
     public Image process(Image imageIn) {

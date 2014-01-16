@@ -11,6 +11,8 @@ import com.google.zxing.qrcode.encoder.ByteMatrix;
 import com.google.zxing.qrcode.encoder.QRCode;
 import com.imagefilter.IImageFilter;
 import com.imagefilter.Image;
+import com.imagefilter.effect.AutoAdjustFilter;
+import com.imagefilter.effect.BrightContrastFilter;
 import com.imagefilter.effect.ConvolutionFilter;
 
 /**
@@ -120,15 +122,18 @@ public class GradientQREffect extends QREffectInterface {
 
         int binStartColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight - frontHeight) / 2.0f);
         int binEndColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight + frontHeight) / 2.0f);
-        // 二值化
-//        Bitmap front = binarization(opt.frontBitmap, bgColor, binStartColor, binEndColor);
+
+//        Bitmap bt = makeFilter(opt.frontBitmap, new BrightContrastFilter());
+//        bt = convertGrayImg(bt);
+//        return bitmapHSB(bt, binStartColor, binEndColor);
+
         Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
         Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), true);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
+        scaleFront = makeFilter(scaleFront, new BrightContrastFilter(0.15f, 0.0f));
         scaleFront = convertGrayImg(scaleFront);
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
         if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
-//            opt.frontBitmap.recycle();
             opt.frontBitmap = null;
         }
 
@@ -141,7 +146,7 @@ public class GradientQREffect extends QREffectInterface {
             scaleBroder = null;
         }
 
-        // 加边框
+        //加边框
         front = borderFront(border.getWidth(), border.getHeight(), border, front);
 
         // 遮盖切割
@@ -189,9 +194,8 @@ public class GradientQREffect extends QREffectInterface {
 
         ColorMatrix allMatrix = new ColorMatrix();
         ColorMatrix colorMatrix = new ColorMatrix();
-        setContrast(colorMatrix, 160, 120);
+        setContrast(colorMatrix, 145, 120);
         allMatrix.postConcat(colorMatrix);
-//
         paint.setColorFilter(new ColorMatrixColorFilter(allMatrix));
 
         canvas.drawBitmap(bt, 0, 0, paint);

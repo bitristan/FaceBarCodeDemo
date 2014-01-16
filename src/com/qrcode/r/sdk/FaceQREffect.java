@@ -22,6 +22,7 @@ public class FaceQREffect extends QREffectInterface {
     private static final int MAX_FACES = 1;
     private static final float CENTER_PERCENT = 0.3f;
     private static final int DEFAULT_BORDER = 2;
+    private static final int RECT_BORDER = 1;
 
     @Override
     Bitmap makeEffectQRCode(String content, QRCodeOptionsInterface opt) {
@@ -58,8 +59,8 @@ public class FaceQREffect extends QREffectInterface {
         }
         int inputWidth = input.getWidth();
         int inputHeight = input.getHeight();
-        int qrWidth = inputWidth + border;
-        int qrHeight = inputHeight + border;
+        int qrWidth = inputWidth + border + RECT_BORDER * 2;
+        int qrHeight = inputHeight + border + RECT_BORDER * 2;
         int outputWidth = Math.max(width, qrWidth);
         int outputHeight = Math.max(height, qrHeight);
 
@@ -96,18 +97,6 @@ public class FaceQREffect extends QREffectInterface {
             }
 
             if (faceRect.width() > maxCenterSize) {
-//                faceScaleCoefficient = (float) maxCenterSize / faceRect.width();
-//                faceBmp = Bitmap.createScaledBitmap(faceBmp, (int) (faceBmp.getWidth() * faceScaleCoefficient), (int) (faceBmp.getHeight() * faceScaleCoefficient), false);
-//                int faceRectWidth = (int) (faceRect.width() * faceScaleCoefficient);
-//                int faceRectHeight = (int) (faceRect.height() * faceScaleCoefficient);
-//
-//                faceRect.left = (int) (faceRect.left * faceScaleCoefficient);
-//                faceRect.top = (int) (faceRect.top * faceScaleCoefficient);
-//                faceRect.right = faceRect.left + faceRectWidth;
-//                faceRect.bottom = faceRect.top + faceRectHeight;
-//
-//                faceLeftPos = (width - faceBmp.getWidth()) / 2;
-//                faceTopPos = (height - faceBmp.getHeight()) / 2;
                 int detaX = (faceRect.width() - maxCenterSize) / 2;
                 faceRect.left = faceRect.left + detaX;
                 faceRect.right = faceRect.right - detaX;
@@ -117,11 +106,6 @@ public class FaceQREffect extends QREffectInterface {
                 faceRect.top = faceRect.top + deatH;
                 faceRect.bottom = faceRect.bottom - deatH;
             }
-//
-//            faceRect.left += faceLeftPos;
-//            faceRect.top += faceTopPos;
-//            faceRect.right += faceLeftPos;
-//            faceRect.bottom += faceTopPos;
         } else {
             //没有识别出人脸
             findFace = false;
@@ -134,9 +118,11 @@ public class FaceQREffect extends QREffectInterface {
         detectFaceBmp.recycle();
 
         faceBmp = makeFilter(faceBmp, new ConvolutionFilter());
-        if (findFace ) {
-            faceBmp = makeFilter(faceBmp, new AutoLevelFilter());
-        }
+        faceBmp = makeFilter(faceBmp, new BrightContrastFilter(0.1f, 0.0f));
+        faceBmp = makeFilter(faceBmp, new BrightContrastFilter(0.0f, 0.1f));
+//        if (findFace) {
+//            faceBmp = makeFilter(faceBmp, new AutoLevelFilter());
+//        }
         faceBmp = makeFilter(faceBmp, new BigBrotherCustomFilter(Color.blue(color), Color.green(color), Color.red(color)));
 
         Paint paint = new Paint();
@@ -147,7 +133,7 @@ public class FaceQREffect extends QREffectInterface {
         Canvas canvasTop = new Canvas(out);
         canvasTop.drawColor(Color.WHITE);
         paint.setColor(color);
-        paint.setAlpha(200);
+        paint.setAlpha(150);
 
         if (findFace) {
             canvasTop.drawBitmap(faceBmp, faceLeftPos, faceTopPos, paint);
@@ -188,6 +174,14 @@ public class FaceQREffect extends QREffectInterface {
         if (!findFace) {
             canvasTop.drawBitmap(faceBmp, faceLeftPos, faceTopPos, paint);
         }
+
+        paint.setColor(color);
+        paint.setAlpha(0xff);
+        paint.setStrokeWidth(multiple);
+        canvasTop.drawLine(0, 0, width, 0, paint);//上
+        canvasTop.drawLine(0, height, width, height , paint);//下
+        canvasTop.drawLine(0, 0, 0, height, paint);//左
+        canvasTop.drawLine(width, 0, width, height, paint);//右
 
         return out;
     }

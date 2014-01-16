@@ -23,7 +23,8 @@ public class QRCodeMainActivity extends BaseActivity {
     private ViewPager mViewPager;
     private ImageSelectPagerAdapter mImageSelectPagerAdapter;
 
-    private int[] mResList = { R.drawable.hehua, R.drawable.test_123456, R.drawable.test_1234567, R.drawable.test_hsv };
+    private int[] mResList = { R.drawable.hehua, R.drawable.test_123456, R.drawable.test_1234567, R.drawable.test_hsv
+                                , R.drawable.test_1, R.drawable.test_2, R.drawable.test_3 };
 
     private EditText mContentET;
 
@@ -126,12 +127,15 @@ public class QRCodeMainActivity extends BaseActivity {
         public Object instantiateItem(ViewGroup container, final int position) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.gradient_one, null);
             ImageView imageview = (ImageView) view.findViewById(R.id.image);
+            final View cover = view.findViewById(R.id.cover);
             final CheckBox cb = (CheckBox) view.findViewById(R.id.choose_cb);
             cb.setVisibility(View.VISIBLE);
             if (mResList[position] == mCurrentResID) {
                 cb.setChecked(true);
+                cover.setVisibility(View.VISIBLE);
             } else {
                 cb.setChecked(false);
+                cover.setVisibility(View.GONE);
             }
 
             imageview.setImageResource(mResList[position]);
@@ -141,6 +145,13 @@ public class QRCodeMainActivity extends BaseActivity {
                     if (mCurrentResID != mResList[position]) {
                         mCurrentResID = mResList[position];
                         cb.setChecked(true);
+                        cover.setVisibility(View.VISIBLE);
+                        notifyDataSetChanged();
+                    } else {
+                        mCurrentResID = 0;
+                        cb.setChecked(false);
+                        cover.setVisibility(View.GONE);
+                        notifyDataSetChanged();
                     }
                 }
             });

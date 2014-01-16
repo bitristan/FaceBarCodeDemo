@@ -15,6 +15,13 @@
         android:background="@drawable/picture_frame_default"
         />
 
+    <View
+        android:id="@+id/cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/white_trans"
+        android:visibility="gone"/>
+
     <CheckBox
         android:id="@+id/choose_cb"
         android:layout_width="50dp"
