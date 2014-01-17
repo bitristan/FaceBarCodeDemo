@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.Config;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 
 /**
  * @author daizhj
@@ -52,6 +53,14 @@ public class Image {
         updateColorArray();
     }
 
+    public Rect getImageRect() {
+        if (image == null) {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        return new Rect(0, 0, image.getWidth(), image.getHeight());
+    }
+
     public Image clone() {
         return new Image(this.image);
     }
@@ -73,8 +82,6 @@ public class Image {
     /**
      * Set color array for image - called on initialisation
      * by constructor
-     *
-     * @param bitmap
      */
     private void updateColorArray() {
         colorArray = new int[width * height];
@@ -86,7 +93,7 @@ public class Image {
                 r = (colorArray[index] >> 16) & 0xff;
                 g = (colorArray[index] >> 8) & 0xff;
                 b = colorArray[index] & 0xff;
-                colorArray[index] = 0xff000000 | (b << 16) | (g << 8) | r;//androidϵͳ��windowϵͳ��rgb�洢��ʽ�෴
+                colorArray[index] = 0xff000000 | (b << 16) | (g << 8) | r;
             }
         }
     }

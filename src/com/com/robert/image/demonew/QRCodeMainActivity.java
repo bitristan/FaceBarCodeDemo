@@ -30,6 +30,7 @@ public class QRCodeMainActivity extends BaseActivity {
 
     private View mGradientBt;
     private View mFaceBt;
+    private View mFilterBt;
 
     private int mCurrentResID;
 
@@ -49,6 +50,7 @@ public class QRCodeMainActivity extends BaseActivity {
         mContentET = (EditText) findViewById(R.id.qr_content);
         mGradientBt = findViewById(R.id.gradient);
         mFaceBt = findViewById(R.id.face);
+        mFilterBt = findViewById(R.id.filter);
 
         mContentET.setText(Config.QRCODE_CONTENT);
         mGradientBt.setOnClickListener(new View.OnClickListener() {
@@ -85,6 +87,26 @@ public class QRCodeMainActivity extends BaseActivity {
 
                 Intent i = new Intent();
                 i.setClass(getApplicationContext(), FaceCompose1Activity.class);
+                i.putExtra(Config.KEY_QRCODE_CONTENT, mContentET.getText().toString());
+                i.putExtra(Config.KEY_RES_ID, mCurrentResID);
+                startActivity(i);
+            }
+        });
+
+        mFilterBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCurrentResID == 0) {
+                    Toast.makeText(getApplicationContext(), "没有选择资源", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (TextUtils.isEmpty(mContentET.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "二维码内容不能为空", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                Intent i = new Intent();
+                i.setClass(getApplicationContext(), ImageFilterActivity.class);
                 i.putExtra(Config.KEY_QRCODE_CONTENT, mContentET.getText().toString());
                 i.putExtra(Config.KEY_RES_ID, mCurrentResID);
                 startActivity(i);

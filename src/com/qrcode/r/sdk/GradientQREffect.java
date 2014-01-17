@@ -14,6 +14,7 @@ import com.imagefilter.Image;
 import com.imagefilter.effect.AutoAdjustFilter;
 import com.imagefilter.effect.BrightContrastFilter;
 import com.imagefilter.effect.ConvolutionFilter;
+import com.imagefilter.effect.ExposureFilter;
 
 /**
  * Created by zhangdi on 13-12-20.
@@ -123,15 +124,18 @@ public class GradientQREffect extends QREffectInterface {
         int binStartColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight - frontHeight) / 2.0f);
         int binEndColor = getGradientColorByCurve(startColor, endColor, 0, realHeight, (realHeight + frontHeight) / 2.0f);
 
-//        Bitmap bt = makeFilter(opt.frontBitmap, new BrightContrastFilter());
-//        bt = convertGrayImg(bt);
+//        Bitmap bt = opt.frontBitmap;
+//        bt = makeFilter(bt, new ExposureFilter(1.4f));
+//        bt = makeFilter(bt, new BrightContrastFilter(0.0f, 0.35f));
+////        bt = convertGrayImg(bt);
 //        return bitmapHSB(bt, binStartColor, binEndColor);
 
         Rect frontRect = new Rect((realWidth - frontWidth) / 2, (realHeight - frontHeight) / 2, (realWidth + frontWidth) / 2, (realHeight + frontHeight) / 2);
         Bitmap scaleFront = Bitmap.createScaledBitmap(opt.frontBitmap, frontRect.width(), frontRect.height(), true);
         //现将图片做一次缩放，目的是为了减小处理的像素数量
-        scaleFront = makeFilter(scaleFront, new BrightContrastFilter(0.15f, 0.0f));
-        scaleFront = convertGrayImg(scaleFront);
+        scaleFront = makeFilter(scaleFront, new ExposureFilter(1.4f));
+        scaleFront = makeFilter(scaleFront, new BrightContrastFilter(0.0f, 0.35f));
+//        scaleFront = convertGrayImg(scaleFront);
         Bitmap front = bitmapHSB(scaleFront, binStartColor, binEndColor);
         if (opt.frontBitmap != null && !opt.frontBitmap.isRecycled()) {
             opt.frontBitmap = null;

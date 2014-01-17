@@ -41,6 +41,7 @@
             android:label="文字处理">
         </activity>
         <activity android:name=".TextCodeActivity"/>
+        <activity android:name="com.com.robert.image.demonew.ImageFilterActivity"/>
         <activity android:name=".PixelActivity"/>
         <activity android:name="com.com.robert.image.demonew.GradientActivity"/>
         <activity android:name="com.com.robert.image.demonew.BaseActivity"/>
